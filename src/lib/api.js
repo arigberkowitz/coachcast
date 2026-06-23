@@ -1,56 +1,77 @@
-// The only place the client talks to the recap endpoint.
-// It calls OUR serverless function (/api/generate-recap) — never api.anthropic.com.
-// The API key lives server-side only.
+// The only place the client talks to our serverless endpoints. It calls OUR
+// /api/* functions (never api.anthropic.com); the API keys live server-side.
 
-export async function generateRecap({ mode, sport, tone, athlete, transcript }) {
-  const res = await fetch('/api/generate-recap', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode,
-      sport,
-      tone,
-      athlete: {
-        firstName: athlete.name.split(' ')[0],
-        age: athlete.age,
-        history: athlete.recaps.slice(0, 2).map((r) => r.headline).join('; '),
-      },
-      transcript,
-    }),
-  });
-  if (!res.ok) throw new Error('recap request failed');
+export class ApiError extends Error {
+  constructor(kind, message, status) {
+    super(message);
+    this.name = 'ApiError';
+    this.kind = kind; // 'network' = couldn't reach the server | 'server' = HTTP error from a reachable server
+    this.status = status;
+  }
+}
+
+// POST JSON and throw a TYPED error: a genuine network failure (offline, server
+// unreachable) vs. an HTTP error from a server we did reach. Callers pair this with
+// errorMessage() so we only blame the connection when the connection is the problem.
+async function postJSON(url, body) {
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    // fetch only rejects for real network problems (offline, DNS, CORS, aborted)
+    throw new ApiError('network', 'Could not reach the server');
+  }
+  if (!res.ok) {
+    let serverMsg = '';
+    try {
+      serverMsg = (await res.json())?.error || '';
+    } catch {
+      // response body wasn't JSON
+    }
+    throw new ApiError('server', serverMsg || `Request failed (${res.status})`, res.status);
+  }
   return res.json();
 }
 
-export async function translateRecap({ text, language }) {
-  const res = await fetch('/api/translate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, language }),
-  });
-  if (!res.ok) throw new Error('translate request failed');
-  return res.json(); // { text }
+// Human-facing message. ONLY mentions the connection for a real network failure;
+// a reachable server that returned an error gets the caller's fallback instead.
+export function errorMessage(e, fallback) {
+  if (e?.kind === 'network') {
+    return typeof navigator !== 'undefined' && navigator.onLine === false
+      ? "You're offline — check your Wi-Fi connection and try again."
+      : 'Couldn’t reach the server. Check your connection and try again.';
+  }
+  return fallback;
 }
 
-export async function summarizeAthlete({ mode, sport, athlete, recaps }) {
-  const res = await fetch('/api/summarize', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ mode, sport, athlete, recaps }),
+export function generateRecap({ mode, sport, tone, athlete, transcript }) {
+  return postJSON('/api/generate-recap', {
+    mode,
+    sport,
+    tone,
+    athlete: {
+      firstName: athlete.name.split(' ')[0],
+      age: athlete.age,
+      history: athlete.recaps.slice(0, 2).map((r) => r.headline).join('; '),
+    },
+    transcript,
   });
-  if (!res.ok) throw new Error('summarize request failed');
-  return res.json(); // { headline, summary }
+}
+
+export function translateRecap({ text, language }) {
+  return postJSON('/api/translate', { text, language }); // { text }
+}
+
+export function summarizeAthlete({ mode, sport, athlete, recaps }) {
+  return postJSON('/api/summarize', { mode, sport, athlete, recaps }); // { headline, summary }
 }
 
 // Emails a finished recap to a parent via our serverless function (Resend).
-// Throws with a human-readable message (incl. "not set up yet" when the key is absent).
-export async function sendRecapEmail({ to, subject, text }) {
-  const res = await fetch('/api/send-recap', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ to, subject, text }),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.error || 'Could not send the email.');
-  return data; // { ok, id }
+// On a reachable-server error the thrown message is the server's (e.g. "not set up yet").
+export function sendRecapEmail({ to, subject, text }) {
+  return postJSON('/api/send-recap', { to, subject, text }); // { ok, id }
 }

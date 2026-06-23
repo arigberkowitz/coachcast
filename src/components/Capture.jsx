@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Mic, Square, Sparkles, LoaderCircle, Keyboard, FileText } from 'lucide-react';
 import { T, TONES, sportById } from '../lib/sports';
-import { generateRecap } from '../lib/api';
+import { generateRecap, errorMessage } from '../lib/api';
 import { useSpeech } from '../lib/useSpeech';
 import { useBrand } from '../auth/BrandContext';
 import { Avatar, SelectChip, PrimaryButton, GhostButton, Eyebrow } from './ui';
@@ -30,8 +30,8 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
     try {
       const recap = await generateRecap({ mode: brand.id, sport, tone, athlete, transcript });
       onGenerated(recap, { sport, tone, transcript: transcript.trim() });
-    } catch {
-      setError("Couldn't write the recap. Check your connection and try again.");
+    } catch (e) {
+      setError(errorMessage(e, "Couldn't write the recap. Please try again in a moment."));
     } finally {
       setLoading(false);
     }

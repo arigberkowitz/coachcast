@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle, FileText, ImagePlus } from 'lucide-react';
 import { T, space, sportById, TONES } from '../lib/sports';
-import { generateRecap, translateRecap } from '../lib/api';
+import { generateRecap, translateRecap, errorMessage } from '../lib/api';
 import { fileToResizedDataURL } from '../lib/image';
 import { useBrand } from '../auth/BrandContext';
 import { Avatar, PrimaryButton, GhostButton, Eyebrow, SelectChip } from './ui';
@@ -92,8 +92,8 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
       setTranslatedTo(null);
       setEnglishBackup(null);
       setShowLangs(false);
-    } catch {
-      setError("Couldn't rewrite the recap. Try again.");
+    } catch (e) {
+      setError(errorMessage(e, "Couldn't rewrite the recap. Try again."));
     } finally {
       setBusy('');
     }
@@ -110,8 +110,8 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
       setEnglishBackup(backup);
       setParentMessage(text);
       setTranslatedTo(language);
-    } catch {
-      setError("Couldn't translate the message. Try again.");
+    } catch (e) {
+      setError(errorMessage(e, "Couldn't translate the message. Try again."));
     } finally {
       setBusy('');
     }

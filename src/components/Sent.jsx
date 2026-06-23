@@ -4,7 +4,7 @@ import { T, space } from '../lib/sports';
 import { recapShareText } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
 import { useBrand } from '../auth/BrandContext';
-import { sendRecapEmail } from '../lib/api';
+import { sendRecapEmail, errorMessage } from '../lib/api';
 import { PrimaryButton, GhostButton } from './ui';
 
 export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
@@ -27,7 +27,7 @@ export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
       await sendRecapEmail({ to: athlete.parentEmail, subject, text: emailText });
       setEmailed(true);
     } catch (e) {
-      setErr(e.message || 'Could not send the email.');
+      setErr(errorMessage(e, e.message || 'Could not send the email.'));
     } finally {
       setSending(false);
     }

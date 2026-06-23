@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Copy, Check, LoaderCircle, Sparkles } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtDate } from '../lib/format';
-import { summarizeAthlete } from '../lib/api';
+import { summarizeAthlete, errorMessage } from '../lib/api';
 import { useBrand } from '../auth/BrandContext';
 import { IconButton } from './ui';
 
@@ -27,8 +27,8 @@ export default function SummarySheet({ athlete, onClose }) {
           })),
         });
         if (alive) setState({ loading: false, error: '', data });
-      } catch {
-        if (alive) setState({ loading: false, error: "Couldn't write the summary. Check your connection and try again.", data: null });
+      } catch (e) {
+        if (alive) setState({ loading: false, error: errorMessage(e, "Couldn't write the summary. Please try again."), data: null });
       }
     })();
     return () => { alive = false; };
