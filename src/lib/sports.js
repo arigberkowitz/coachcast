@@ -6,20 +6,20 @@ import { Dribbble, Flag, Target, Circle, Hexagon } from 'lucide-react';
 import { Calculator, BookOpen, FlaskConical, Landmark, GraduationCap, Languages, Code, Music } from 'lucide-react';
 
 export const T = {
-  // surfaces
-  bg: '#F6F1EA',
-  bgSunk: '#EFE7DB',
+  // surfaces — Wyzant-style clean white with a warm beige accent surface
+  bg: '#FBFAF9',
+  bgSunk: '#EAE1D9',
   surface: '#FFFFFF',
-  surfaceAlt: '#FBF7F1',
+  surfaceAlt: '#F4F1ED',
 
-  // ink
-  ink: '#211C17',
-  ink70: '#574E44',
-  ink40: '#938979',
+  // ink (Wyzant warm charcoal)
+  ink: '#363232',
+  ink70: '#5C5654',
+  ink40: '#8E8886',
 
   // line
-  line: '#EBE3D7',
-  lineStrong: '#DED4C5',
+  line: '#E4E0DB',
+  lineStrong: '#CFCBC6',
 
   // accent — resolved from the active brand via CSS variables
   accent: 'var(--cc-accent)',
@@ -28,19 +28,19 @@ export const T = {
   accentSoft2: 'var(--cc-accent-soft2)',
   accentGlow: 'var(--cc-accent-glow)', // rgba, for shadows/glows
 
-  // radii + shadow
-  r: 16,
-  rSm: 10,
-  rLg: 22,
+  // radii + shadow — tighter corners + flatter, like Wyzant
+  r: 10,
+  rSm: 7,
+  rLg: 14,
   rPill: 999,
-  shadow: '0 1px 2px rgba(33,28,23,.04), 0 10px 26px rgba(33,28,23,.07)',
-  shadowSoft: '0 1px 2px rgba(33,28,23,.05)',
-  shadowPhone: '0 40px 90px -28px rgba(33,28,23,.45), 0 12px 30px -12px rgba(33,28,23,.25)',
+  shadow: '0 1px 2px rgba(54,50,50,.05), 0 6px 18px rgba(54,50,50,.06)',
+  shadowSoft: '0 1px 2px rgba(54,50,50,.05)',
+  shadowPhone: '0 30px 80px -30px rgba(54,50,50,.35), 0 10px 24px -12px rgba(54,50,50,.2)',
 };
 
 export const space = {
-  display: "'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif",
-  body: "'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif",
+  display: "'Ubuntu', ui-sans-serif, system-ui, sans-serif",
+  body: "'Open Sans', ui-sans-serif, system-ui, -apple-system, sans-serif",
 };
 
 // Coach categories (sports)

@@ -89,13 +89,11 @@ export function PrimaryButton({ children, style, ...props }) {
         gap: 8,
         padding: '14px 18px',
         borderRadius: T.r,
-        background: props.disabled
-          ? '#E6D8CC'
-          : `linear-gradient(140deg, ${T.accent} 0%, color-mix(in srgb, ${T.accent} 84%, #000) 100%)`,
+        background: props.disabled ? '#DAD5D0' : T.accent,
         color: '#fff',
         fontWeight: 600,
         fontSize: 15,
-        boxShadow: props.disabled ? 'none' : `0 8px 20px -8px ${T.accentGlow}`,
+        boxShadow: props.disabled ? 'none' : `0 2px 8px -3px ${T.accentGlow}`,
         transition: 'transform .12s ease, filter .15s ease, background .15s ease',
         ...style,
       }}

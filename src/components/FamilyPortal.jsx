@@ -85,7 +85,7 @@ function FamilyEntry({ onFound, onExit }) {
 
         <button
           type="submit"
-          style={{ width: '100%', marginTop: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 18px', borderRadius: T.r, background: `linear-gradient(140deg, ${T.accent}, color-mix(in srgb, ${T.accent} 84%, #000))`, color: '#fff', fontWeight: 600, fontSize: 15, boxShadow: `0 10px 24px -10px ${T.accentGlow}` }}
+          style={{ width: '100%', marginTop: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '14px 18px', borderRadius: T.r, background: T.accent, color: '#fff', fontWeight: 600, fontSize: 15, boxShadow: `0 2px 8px -3px ${T.accentGlow}` }}
         >
           View progress
           <ArrowRight size={17} strokeWidth={2.5} />

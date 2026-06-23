@@ -131,9 +131,9 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
           textAlign: 'left',
           padding: 15,
           borderRadius: T.rLg,
-          background: `linear-gradient(135deg, ${T.accent} 0%, color-mix(in srgb, ${T.accent} 82%, #000) 100%)`,
+          background: T.accent,
           color: '#fff',
-          boxShadow: `0 14px 30px -14px ${T.accentGlow}`,
+          boxShadow: `0 6px 16px -8px ${T.accentGlow}`,
           transition: 'transform .12s ease',
           marginBottom: 20,
         }}

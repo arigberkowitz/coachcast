@@ -98,7 +98,7 @@ export const BRANDS = {
     categoryLabel: 'Sport',
     categories: SPORTS,
     recap: { workedOn: 'Worked on', improved: 'Improved', nextFocus: 'Up next', homework: 'Practice at home' },
-    accent: { accent: '#FF5A2C', accentText: '#C5400F', accentSoft: '#FFEDE5', accentSoft2: '#FFDDCF', accentGlow: 'rgba(255,90,44,.7)' },
+    accent: { accent: '#ED6D20', accentText: '#B4500F', accentSoft: '#FCE7D6', accentSoft2: '#F8D2B5', accentGlow: 'rgba(237,109,32,.5)' },
     auth: {
       eyebrow: 'Coach sign-in',
       heroLine1: 'Recaps parents',
@@ -124,7 +124,7 @@ export const BRANDS = {
     categoryLabel: 'Subject',
     categories: SUBJECTS,
     recap: { workedOn: 'Covered today', improved: 'Strengths', nextFocus: 'Next focus', homework: 'Homework' },
-    accent: { accent: '#4C56D6', accentText: '#343CA0', accentSoft: '#ECEEFC', accentSoft2: '#DADDF6', accentGlow: 'rgba(76,86,214,.6)' },
+    accent: { accent: '#3F9139', accentText: '#2C6A28', accentSoft: '#E5F1E2', accentSoft2: '#CAE4C4', accentGlow: 'rgba(63,145,57,.4)' },
     auth: {
       eyebrow: 'Tutor sign-in',
       heroLine1: 'Progress parents',
@@ -150,6 +150,6 @@ export const getBrand = (id) => BRANDS[id] || BRANDS.coach;
 export const FAMILY = {
   id: 'family',
   name: 'Family',
-  accent: { accent: '#0F9E75', accentText: '#0B6B50', accentSoft: '#DCF2EA', accentSoft2: '#BFE7D9', accentGlow: 'rgba(15,158,117,.5)' },
+  accent: { accent: '#1F73C9', accentText: '#0B4E96', accentSoft: '#DEECFB', accentSoft2: '#BCD8F4', accentGlow: 'rgba(31,115,201,.45)' },
   chooser: { title: "I'm a parent or student", sub: "See a child's progress and homework with a code" },
 };

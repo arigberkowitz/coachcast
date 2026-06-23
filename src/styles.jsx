@@ -3,16 +3,16 @@
 // matching the prototype's single-file approach.
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&family=Ubuntu:wght@400;500;700&display=swap');
 
-/* Default accent (coach / coral). The active brand overrides these on its root
-   wrapper, so the whole app reskins by swapping four variables. */
+/* Default accent (coach / Wyzant orange). The active brand overrides these on its
+   root wrapper, so the whole app reskins by swapping these variables. */
 :root {
-  --cc-accent: #FF5A2C;
-  --cc-accent-text: #C5400F;
-  --cc-accent-soft: #FFEDE5;
-  --cc-accent-soft2: #FFDDCF;
-  --cc-accent-glow: rgba(255,90,44,.7);
+  --cc-accent: #ED6D20;
+  --cc-accent-text: #B4500F;
+  --cc-accent-soft: #FCE7D6;
+  --cc-accent-soft2: #F8D2B5;
+  --cc-accent-glow: rgba(237,109,32,.5);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -21,9 +21,9 @@ const CSS = `
 html, body, #root { height: 100%; }
 
 body {
-  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  color: #211C17;
-  background: #F6F1EA;
+  font-family: 'Open Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #363232;
+  background: #FFFFFF;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   line-height: 1.5;
