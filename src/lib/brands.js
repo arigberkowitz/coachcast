@@ -14,7 +14,7 @@ const coachSeed = [
       { id: 'g_maya_2', text: 'Dribble with head up', createdAt: '2026-05-05T00:00:00.000Z', achievedAt: '2026-06-02T00:00:00.000Z' },
     ],
     recaps: [
-      { id: 'r_maya_1', athleteId: 'a_maya', createdAt: '2026-06-09T17:40:00.000Z', sport: 'basketball', tone: 'warm', note: 'worked on layups off both feet, still rushing the second step. great energy today.', headline: 'Layups are getting smoother', workedOn: ['Layups off both feet', 'Slowing the approach'], improved: ['Right-hand finish at the rim'], nextFocus: ['Left-hand layups under control'], parentMessage: "Maya had a great session. We spent most of it on layups, and her right-hand finish is really coming along — she's getting the footwork right more often than not. She still speeds up on the second step when she gets excited, so next time we'll slow that down and add her left hand. She works hard and it shows.", sent: true },
+      { id: 'r_maya_1', athleteId: 'a_maya', createdAt: '2026-06-09T17:40:00.000Z', sport: 'basketball', tone: 'warm', note: 'worked on layups off both feet, still rushing the second step. great energy today.', headline: 'Layups are getting smoother', workedOn: ['Layups off both feet', 'Slowing the approach'], improved: ['Right-hand finish at the rim'], nextFocus: ['Left-hand layups under control'], homework: '10 minutes of left-hand layups, 3 times this week.', parentMessage: "Maya had a great session. We spent most of it on layups, and her right-hand finish is really coming along — she's getting the footwork right more often than not. She still speeds up on the second step when she gets excited, so next time we'll slow that down and add her left hand. She works hard and it shows.", sent: true },
       { id: 'r_maya_2', athleteId: 'a_maya', createdAt: '2026-06-02T17:30:00.000Z', sport: 'basketball', tone: 'warm', note: 'dribbling with head up, ball control drills. doing well keeping eyes up.', headline: 'Dribbling with her head up', workedOn: ['Ball control', 'Keeping eyes up while dribbling'], improved: ['Confidence with the left hand'], nextFocus: ['Changing speed off the dribble'], parentMessage: "Good session today. Maya is starting to keep her head up while she dribbles instead of staring at the ball, which is a big step. Her left hand is getting more comfortable too. Next week we'll work on changing speeds so defenders can't settle.", sent: true },
     ],
   },
@@ -54,7 +54,7 @@ const tutorSeed = [
       { id: 'g_sofia_2', text: 'Multiplication facts through 10', createdAt: '2026-05-01T00:00:00.000Z', achievedAt: '2026-06-11T00:00:00.000Z' },
     ],
     recaps: [
-      { id: 'r_sofia_1', athleteId: 's_sofia', createdAt: '2026-06-18T22:00:00.000Z', sport: 'math', tone: 'warm', note: 'fractions, adding with unlike denominators. getting common denominators now.', headline: 'Fractions are clicking', workedOn: ['Adding fractions with unlike denominators', 'Finding common denominators'], improved: ['Spotting the lowest common denominator quickly'], nextFocus: ['Subtracting mixed numbers'], parentMessage: "Sofia had a really good session. Adding fractions with different denominators was tripping her up, and today it clicked — she's finding common denominators on her own now instead of guessing. Next time we'll move on to subtracting mixed numbers. She stuck with the hard problems and it paid off.", sent: true },
+      { id: 'r_sofia_1', athleteId: 's_sofia', createdAt: '2026-06-18T22:00:00.000Z', sport: 'math', tone: 'warm', note: 'fractions, adding with unlike denominators. getting common denominators now.', headline: 'Fractions are clicking', workedOn: ['Adding fractions with unlike denominators', 'Finding common denominators'], improved: ['Spotting the lowest common denominator quickly'], nextFocus: ['Subtracting mixed numbers'], homework: 'Fractions worksheet, problems 1–12, before Thursday.', parentMessage: "Sofia had a really good session. Adding fractions with different denominators was tripping her up, and today it clicked — she's finding common denominators on her own now instead of guessing. Next time we'll move on to subtracting mixed numbers. She stuck with the hard problems and it paid off.", sent: true },
       { id: 'r_sofia_2', athleteId: 's_sofia', createdAt: '2026-06-11T22:00:00.000Z', sport: 'math', tone: 'straight', note: 'multiplication facts speed, 6s and 7s shaky. flashcards helped.', headline: 'Sharpening multiplication facts', workedOn: ['Multiplication facts', 'Speed on the 6s and 7s'], improved: ['Recall on the 8s'], nextFocus: ['Timed practice on 6s and 7s'], parentMessage: "We drilled multiplication facts today. Her 8s are solid now; the 6s and 7s are still a beat slow, so a few minutes of flashcards at home would help. Good focus throughout.", sent: true },
     ],
   },
@@ -97,7 +97,7 @@ export const BRANDS = {
     personPlural: 'Athletes',
     categoryLabel: 'Sport',
     categories: SPORTS,
-    recap: { workedOn: 'Worked on', improved: 'Improved', nextFocus: 'Up next' },
+    recap: { workedOn: 'Worked on', improved: 'Improved', nextFocus: 'Up next', homework: 'Practice at home' },
     accent: { accent: '#FF5A2C', accentText: '#C5400F', accentSoft: '#FFEDE5', accentSoft2: '#FFDDCF', accentGlow: 'rgba(255,90,44,.7)' },
     auth: {
       eyebrow: 'Coach sign-in',
@@ -123,7 +123,7 @@ export const BRANDS = {
     personPlural: 'Students',
     categoryLabel: 'Subject',
     categories: SUBJECTS,
-    recap: { workedOn: 'Covered today', improved: 'Strengths', nextFocus: 'Next focus' },
+    recap: { workedOn: 'Covered today', improved: 'Strengths', nextFocus: 'Next focus', homework: 'Homework' },
     accent: { accent: '#4C56D6', accentText: '#343CA0', accentSoft: '#ECEEFC', accentSoft2: '#DADDF6', accentGlow: 'rgba(76,86,214,.6)' },
     auth: {
       eyebrow: 'Tutor sign-in',

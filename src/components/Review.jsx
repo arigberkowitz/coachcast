@@ -57,6 +57,7 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
   const [workedOn, setWorkedOn] = useState(draft.workedOn || []);
   const [improved, setImproved] = useState(draft.improved || []);
   const [nextFocus, setNextFocus] = useState(draft.nextFocus || []);
+  const [homework, setHomework] = useState(draft.homework || '');
   const [parentMessage, setParentMessage] = useState(draft.parentMessage || '');
 
   const [tone, setTone] = useState(draft.tone || 'warm');
@@ -80,6 +81,7 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
       setWorkedOn(r.workedOn || []);
       setImproved(r.improved || []);
       setNextFocus(r.nextFocus || []);
+      setHomework(r.homework || '');
       setParentMessage(r.parentMessage || '');
       setTone(newTone);
       setTranslatedTo(null);
@@ -122,6 +124,7 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
     workedOn: workedOn.map((x) => x.trim()).filter(Boolean),
     improved: improved.map((x) => x.trim()).filter(Boolean),
     nextFocus: nextFocus.map((x) => x.trim()).filter(Boolean),
+    homework: homework.trim(),
     parentMessage: parentMessage.trim(),
     language: translatedTo || 'English',
   });
@@ -207,6 +210,19 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
         <EditableList label={brand.recap.workedOn} items={workedOn} onChange={setWorkedOn} max={3} />
         <EditableList label={brand.recap.improved} items={improved} onChange={setImproved} max={3} />
         <EditableList label={brand.recap.nextFocus} items={nextFocus} onChange={setNextFocus} max={2} />
+
+        {/* homework / practice */}
+        <div style={{ marginTop: 18 }}>
+          <Eyebrow style={{ marginBottom: 8 }}>{brand.recap.homework}</Eyebrow>
+          <input
+            value={homework}
+            onChange={(e) => setHomework(e.target.value)}
+            placeholder={`Add ${brand.recap.homework.toLowerCase()} (optional)`}
+            style={{ width: '100%', padding: '11px 13px', borderRadius: T.rSm, border: `1.5px solid ${T.line}`, background: T.surface, fontSize: 14, color: T.ink, outline: 'none' }}
+            onFocus={(e) => (e.target.style.borderColor = T.accent)}
+            onBlur={(e) => (e.target.style.borderColor = T.line)}
+          />
+        </div>
 
         {/* parent message + translate */}
         <div style={{ marginTop: 22 }}>

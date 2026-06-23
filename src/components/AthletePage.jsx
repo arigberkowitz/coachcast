@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2, FileText, Send } from 'lucide-react';
+import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2, FileText, Send, NotebookPen } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtFullDate, relativeDate } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
+import { useBrand } from '../auth/BrandContext';
 import { deleteRecap, updateRecap } from '../data/store';
 import { Avatar, PrimaryButton, Eyebrow, IconButton } from './ui';
 import Screen from './Screen';
@@ -62,8 +63,10 @@ function TagRow({ icon, items, color }) {
 }
 
 function RecapCard({ recap, index, athleteId, onEdit }) {
+  const { brand } = useBrand();
   const { copied, copy } = useCopy();
   const [confirm, setConfirm] = useState(false);
+  const fullText = recap.parentMessage + (recap.homework ? `\n\n${brand.recap.homework}: ${recap.homework}` : '');
   return (
     <div
       className="cc-anim-up"
@@ -124,6 +127,15 @@ function RecapCard({ recap, index, athleteId, onEdit }) {
         <p style={{ fontSize: 13.5, lineHeight: 1.55, color: T.ink70 }}>{recap.parentMessage}</p>
       </div>
 
+      {recap.homework && (
+        <div style={{ display: 'flex', gap: 8, marginTop: 10, padding: '9px 11px', borderRadius: T.rSm, background: T.accentSoft }}>
+          <NotebookPen size={14} color={T.accentText} style={{ flexShrink: 0, marginTop: 2 }} />
+          <p style={{ fontSize: 13, lineHeight: 1.5, color: T.accentText }}>
+            <strong style={{ fontWeight: 700 }}>{brand.recap.homework}:</strong> {recap.homework}
+          </p>
+        </div>
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 8, marginLeft: -8 }}>
         {confirm ? (
           <>
@@ -138,7 +150,7 @@ function RecapCard({ recap, index, athleteId, onEdit }) {
                 <Send size={14} strokeWidth={2.25} /> Send now
               </CardAction>
             )}
-            <CardAction onClick={() => copy(recap.parentMessage)}>
+            <CardAction onClick={() => copy(fullText)}>
               {copied ? <Check size={14} strokeWidth={2.5} color={T.accent} /> : <Copy size={14} strokeWidth={2.25} />}
               {copied ? 'Copied' : 'Copy'}
             </CardAction>

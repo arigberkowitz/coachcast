@@ -55,7 +55,7 @@ export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
       </div>
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <GhostButton style={{ width: '100%' }} onClick={() => copy(recap.parentMessage)}>
+        <GhostButton style={{ width: '100%' }} onClick={() => copy(recap.parentMessage + (recap.homework ? `\n\n${brand.recap.homework}: ${recap.homework}` : ''))}>
           {copied ? <Check size={16} strokeWidth={2.5} color={T.accent} /> : <Copy size={16} strokeWidth={2.25} />}
           {copied ? 'Copied to clipboard' : 'Copy message to send'}
         </GhostButton>
