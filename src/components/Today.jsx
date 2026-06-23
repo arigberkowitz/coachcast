@@ -119,6 +119,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
 
       {/* quick new recap */}
       <button
+        className="cc-sheen"
         onClick={() => setPicking(true)}
         style={{
           width: '100%',
@@ -128,7 +129,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
           textAlign: 'left',
           padding: 15,
           borderRadius: T.rLg,
-          background: T.accent,
+          background: `linear-gradient(135deg, ${T.accent} 0%, color-mix(in srgb, ${T.accent} 82%, #000) 100%)`,
           color: '#fff',
           boxShadow: `0 14px 30px -14px ${T.accentGlow}`,
           transition: 'transform .12s ease',
@@ -155,7 +156,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
       <div style={{ display: 'flex', gap: 9, marginBottom: 22 }}>
         <Metric value={week} label={week === 1 ? 'recap sent' : 'recaps sent'} icon={<Mic size={15} strokeWidth={2.25} />} />
         <Metric value={athletesRecappedThisWeek(athletes)} label={brand.personPlural.toLowerCase()} icon={<CircleCheck size={15} strokeWidth={2.25} />} />
-        <Metric value={streak} label={streak === 1 ? 'week streak' : 'week streak'} icon={<Flame size={15} strokeWidth={2.25} />} />
+        <Metric value={streak} label="week streak" icon={<Flame size={15} strokeWidth={2.25} className={streak > 0 ? 'cc-flicker' : undefined} />} />
       </div>
 
       {/* due for a recap */}

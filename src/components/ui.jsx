@@ -70,7 +70,9 @@ export function PrimaryButton({ children, style, ...props }) {
         gap: 8,
         padding: '14px 18px',
         borderRadius: T.r,
-        background: props.disabled ? '#F0C7B6' : T.accent,
+        background: props.disabled
+          ? '#E6D8CC'
+          : `linear-gradient(140deg, ${T.accent} 0%, color-mix(in srgb, ${T.accent} 84%, #000) 100%)`,
         color: '#fff',
         fontWeight: 600,
         fontSize: 15,

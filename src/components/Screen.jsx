@@ -6,7 +6,7 @@ import { IconButton } from './ui';
 // and an optional sticky footer for the primary action.
 export default function Screen({ title, onBack, action, footer, children, bodyStyle }) {
   return (
-    <div className="cc-anim-in" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+    <div className="cc-anim-slide" style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
       <div
         style={{
           flexShrink: 0,

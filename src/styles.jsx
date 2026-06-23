@@ -57,6 +57,9 @@ input::placeholder, textarea::placeholder { color: #B4AA9B; }
 @keyframes cc-bar { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
 @keyframes cc-shimmer { 0% { background-position: -360px 0; } 100% { background-position: 360px 0; } }
 @keyframes cc-rise { from { opacity: 0; transform: translateY(16px) scale(.99); } to { opacity: 1; transform: none; } }
+@keyframes cc-slide { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+@keyframes cc-sheen { 0% { transform: translateX(-160%) skewX(-18deg); } 32%, 100% { transform: translateX(260%) skewX(-18deg); } }
+@keyframes cc-flicker { 0%, 100% { opacity: 1; transform: scale(1); } 45% { opacity: .8; transform: scale(1.12) rotate(-3deg); } 70% { opacity: .92; transform: scale(1.04); } }
 
 /* Fill mode "backwards" (not "both"): the entrance plays from a hidden start, but
    the resting state is always the element's natural opacity — content can never get
@@ -64,6 +67,11 @@ input::placeholder, textarea::placeholder { color: #B4AA9B; }
 .cc-anim-up { animation: cc-fade-up .42s cubic-bezier(.22,.8,.3,1) backwards; }
 .cc-anim-in { animation: cc-fade-in .3s ease backwards; }
 .cc-anim-rise { animation: cc-rise .5s cubic-bezier(.22,.8,.3,1) backwards; }
+.cc-anim-slide { animation: cc-slide .4s cubic-bezier(.22,.8,.3,1) backwards; }
+.cc-flicker { animation: cc-flicker 3s ease-in-out infinite; }
+/* a slow light sweep for the hero CTA */
+.cc-sheen { position: relative; overflow: hidden; }
+.cc-sheen::after { content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: 0; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); animation: cc-sheen 5.5s ease-in-out infinite; pointer-events: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
