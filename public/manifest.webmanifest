@@ -1,0 +1,13 @@
+{
+  "name": "CoachCast",
+  "short_name": "CoachCast",
+  "description": "Parent-ready progress recaps for coaches and tutors.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F6F1EA",
+  "theme_color": "#F6F1EA",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

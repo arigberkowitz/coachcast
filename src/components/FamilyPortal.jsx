@@ -204,6 +204,9 @@ function FamilyView({ entry, onChange, onExit }) {
                       </p>
                     </div>
                   )}
+                  {r.photo && (
+                    <img src={r.photo} alt="Session attachment" style={{ width: '100%', borderRadius: T.rSm, marginTop: 10, display: 'block', border: `1px solid ${T.line}` }} />
+                  )}
                 </div>
               ))}
             </div>

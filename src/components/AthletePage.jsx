@@ -172,6 +172,10 @@ function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
         </div>
       )}
 
+      {recap.photo && (
+        <img src={recap.photo} alt="Session attachment" style={{ width: '100%', borderRadius: T.rSm, marginTop: 10, display: 'block', border: `1px solid ${T.line}` }} />
+      )}
+
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 8, marginLeft: -8 }}>
         {confirm ? (
           <>

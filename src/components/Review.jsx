@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle, FileText } from 'lucide-react';
+import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle, FileText, ImagePlus } from 'lucide-react';
 import { T, space, sportById, TONES } from '../lib/sports';
 import { generateRecap, translateRecap } from '../lib/api';
+import { fileToResizedDataURL } from '../lib/image';
 import { useBrand } from '../auth/BrandContext';
 import { Avatar, PrimaryButton, GhostButton, Eyebrow, SelectChip } from './ui';
 import Screen from './Screen';
@@ -58,6 +59,7 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
   const [improved, setImproved] = useState(draft.improved || []);
   const [nextFocus, setNextFocus] = useState(draft.nextFocus || []);
   const [homework, setHomework] = useState(draft.homework || '');
+  const [photo, setPhoto] = useState(draft.photo || '');
   const [parentMessage, setParentMessage] = useState(draft.parentMessage || '');
 
   const [tone, setTone] = useState(draft.tone || 'warm');
@@ -125,9 +127,21 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
     improved: improved.map((x) => x.trim()).filter(Boolean),
     nextFocus: nextFocus.map((x) => x.trim()).filter(Boolean),
     homework: homework.trim(),
+    photo,
     parentMessage: parentMessage.trim(),
     language: translatedTo || 'English',
   });
+
+  const pickPhoto = async (e) => {
+    const f = e.target.files?.[0];
+    e.target.value = '';
+    if (!f) return;
+    try {
+      setPhoto(await fileToResizedDataURL(f));
+    } catch {
+      setError("Couldn't add that image.");
+    }
+  };
 
   const send = () => onSend(build());
   const disabled = !parentMessage.trim() || !headline.trim() || !!busy;
@@ -222,6 +236,29 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
             onFocus={(e) => (e.target.style.borderColor = T.accent)}
             onBlur={(e) => (e.target.style.borderColor = T.line)}
           />
+        </div>
+
+        {/* photo */}
+        <div style={{ marginTop: 18 }}>
+          <Eyebrow style={{ marginBottom: 8 }}>Photo</Eyebrow>
+          {photo ? (
+            <div style={{ position: 'relative', display: 'inline-block' }}>
+              <img src={photo} alt="Session attachment" style={{ maxWidth: '100%', maxHeight: 220, borderRadius: T.r, display: 'block', border: `1px solid ${T.line}` }} />
+              <button
+                onClick={() => setPhoto('')}
+                aria-label="Remove photo"
+                style={{ position: 'absolute', top: 8, right: 8, width: 30, height: 30, display: 'grid', placeItems: 'center', borderRadius: 8, background: 'rgba(33,28,23,.6)', color: '#fff' }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '11px 15px', borderRadius: T.r, border: `1.5px dashed ${T.lineStrong}`, color: T.ink70, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+              <ImagePlus size={17} strokeWidth={2.25} color={T.accent} />
+              Add a photo
+              <input type="file" accept="image/*" onChange={pickPhoto} style={{ display: 'none' }} />
+            </label>
+          )}
         </div>
 
         {/* parent message + translate */}
