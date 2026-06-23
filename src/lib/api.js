@@ -20,3 +20,23 @@ export async function generateRecap({ sport, tone, athlete, transcript }) {
   if (!res.ok) throw new Error('recap request failed');
   return res.json();
 }
+
+export async function translateRecap({ text, language }) {
+  const res = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, language }),
+  });
+  if (!res.ok) throw new Error('translate request failed');
+  return res.json(); // { text }
+}
+
+export async function summarizeAthlete({ sport, athlete, recaps }) {
+  const res = await fetch('/api/summarize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sport, athlete, recaps }),
+  });
+  if (!res.ok) throw new Error('summarize request failed');
+  return res.json(); // { headline, summary }
+}

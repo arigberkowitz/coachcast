@@ -1,8 +1,10 @@
-import { Mic, Check, Target, CheckCheck, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtFullDate, relativeDate } from '../lib/format';
 import { Avatar, PrimaryButton, Eyebrow } from './ui';
 import Screen from './Screen';
+import SummarySheet from './SummarySheet';
 
 function TagRow({ icon, items, color }) {
   if (!items?.length) return null;
@@ -93,6 +95,7 @@ function RecapCard({ recap, index }) {
 export default function AthletePage({ athlete, onBack, onNewRecap }) {
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
+  const [summarizing, setSummarizing] = useState(false);
 
   return (
     <Screen
@@ -137,6 +140,32 @@ export default function AthletePage({ athlete, onBack, onNewRecap }) {
         />
       </div>
 
+      {athlete.recaps.length >= 2 && (
+        <button
+          onClick={() => setSummarizing(true)}
+          style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            textAlign: 'left',
+            padding: '12px 14px',
+            borderRadius: T.r,
+            background: T.accentSoft,
+            border: `1px solid ${T.accentSoft2}`,
+            marginBottom: 18,
+          }}
+        >
+          <Sparkles size={18} color={T.accent} strokeWidth={2.25} style={{ flexShrink: 0 }} />
+          <span style={{ flex: 1 }}>
+            <span style={{ display: 'block', fontWeight: 600, fontSize: 14, color: T.accentText }}>Summarize progress</span>
+            <span style={{ display: 'block', fontSize: 12, color: T.ink40 }}>
+              One parent-ready recap across {athlete.name.split(' ')[0]}'s recent sessions
+            </span>
+          </span>
+        </button>
+      )}
+
       <Eyebrow style={{ marginBottom: 10 }}>Progress timeline</Eyebrow>
 
       {athlete.recaps.length === 0 ? (
@@ -159,6 +188,8 @@ export default function AthletePage({ athlete, onBack, onNewRecap }) {
           ))}
         </div>
       )}
+
+      {summarizing && <SummarySheet athlete={athlete} onClose={() => setSummarizing(false)} />}
     </Screen>
   );
 }
