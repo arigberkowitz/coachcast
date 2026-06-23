@@ -1,10 +1,35 @@
 import { useState } from 'react';
-import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles } from 'lucide-react';
+import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2 } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtFullDate, relativeDate } from '../lib/format';
+import { useCopy } from '../lib/useCopy';
+import { deleteRecap } from '../data/store';
 import { Avatar, PrimaryButton, Eyebrow } from './ui';
 import Screen from './Screen';
 import SummarySheet from './SummarySheet';
+
+function CardAction({ children, onClick, danger }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        fontSize: 12.5,
+        fontWeight: 600,
+        color: danger ? '#B23B2E' : T.ink40,
+        padding: '5px 8px',
+        borderRadius: 8,
+        transition: 'background .15s ease, color .15s ease',
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = T.surfaceAlt)}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+    >
+      {children}
+    </button>
+  );
+}
 
 function TagRow({ icon, items, color }) {
   if (!items?.length) return null;
@@ -34,7 +59,9 @@ function TagRow({ icon, items, color }) {
   );
 }
 
-function RecapCard({ recap, index }) {
+function RecapCard({ recap, index, athleteId, onEdit }) {
+  const { copied, copy } = useCopy();
+  const [confirm, setConfirm] = useState(false);
   return (
     <div
       className="cc-anim-up"
@@ -88,11 +115,34 @@ function RecapCard({ recap, index }) {
         <MessageCircle size={14} color={T.ink40} style={{ flexShrink: 0, marginTop: 2 }} />
         <p style={{ fontSize: 13.5, lineHeight: 1.55, color: T.ink70 }}>{recap.parentMessage}</p>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 8, marginLeft: -8 }}>
+        {confirm ? (
+          <>
+            <span style={{ fontSize: 12.5, color: T.ink40, padding: '5px 8px' }}>Delete this recap?</span>
+            <CardAction danger onClick={() => deleteRecap(athleteId, recap.id)}>Delete</CardAction>
+            <CardAction onClick={() => setConfirm(false)}>Cancel</CardAction>
+          </>
+        ) : (
+          <>
+            <CardAction onClick={() => copy(recap.parentMessage)}>
+              {copied ? <Check size={14} strokeWidth={2.5} color={T.accent} /> : <Copy size={14} strokeWidth={2.25} />}
+              {copied ? 'Copied' : 'Copy'}
+            </CardAction>
+            <CardAction onClick={() => onEdit(recap)}>
+              <Pencil size={14} strokeWidth={2.25} /> Edit
+            </CardAction>
+            <CardAction danger onClick={() => setConfirm(true)}>
+              <Trash2 size={14} strokeWidth={2.25} /> Delete
+            </CardAction>
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-export default function AthletePage({ athlete, onBack, onNewRecap }) {
+export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }) {
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
   const [summarizing, setSummarizing] = useState(false);
@@ -184,7 +234,7 @@ export default function AthletePage({ athlete, onBack, onNewRecap }) {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
           {athlete.recaps.map((r, i) => (
-            <RecapCard key={r.id} recap={r} index={i} />
+            <RecapCard key={r.id} recap={r} index={i} athleteId={athlete.id} onEdit={onEditRecap} />
           ))}
         </div>
       )}

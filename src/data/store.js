@@ -101,6 +101,35 @@ export function addAthlete({ name, age, sport }) {
   return a;
 }
 
+export function updateRecap(athleteId, recapId, patch) {
+  let updated = null;
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) =>
+      a.id !== athleteId
+        ? a
+        : {
+            ...a,
+            recaps: a.recaps.map((r) => {
+              if (r.id !== recapId) return r;
+              updated = { ...r, ...patch };
+              return updated;
+            }),
+          },
+    ),
+  });
+  return updated;
+}
+
+export function deleteRecap(athleteId, recapId) {
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) =>
+      a.id !== athleteId ? a : { ...a, recaps: a.recaps.filter((r) => r.id !== recapId) },
+    ),
+  });
+}
+
 export function resetStore() {
   if (mode) setState({ athletes: getBrand(mode).seed });
 }

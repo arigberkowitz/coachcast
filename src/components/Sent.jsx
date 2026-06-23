@@ -1,9 +1,13 @@
-import { Check } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { T, space } from '../lib/sports';
+import { useCopy } from '../lib/useCopy';
+import { useBrand } from '../auth/BrandContext';
 import { PrimaryButton, GhostButton } from './ui';
 
 export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
   const first = athlete.name.split(' ')[0];
+  const { brand } = useBrand();
+  const { copied, copy } = useCopy();
   return (
     <div
       style={{
@@ -51,9 +55,13 @@ export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
       </div>
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <GhostButton style={{ width: '100%' }} onClick={() => copy(recap.parentMessage)}>
+          {copied ? <Check size={16} strokeWidth={2.5} color={T.accent} /> : <Copy size={16} strokeWidth={2.25} />}
+          {copied ? 'Copied to clipboard' : 'Copy message to send'}
+        </GhostButton>
         <PrimaryButton onClick={onViewTimeline}>View {first}'s timeline</PrimaryButton>
         <GhostButton style={{ width: '100%' }} onClick={onDone}>
-          Back to athletes
+          Back to {brand.personPlural.toLowerCase()}
         </GhostButton>
       </div>
     </div>

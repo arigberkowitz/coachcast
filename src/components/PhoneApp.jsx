@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStore, saveRecap } from '../data/store';
+import { useStore, saveRecap, updateRecap } from '../data/store';
 import TabBar from './TabBar';
 import Today from './Today';
 import Home from './Home';
@@ -51,6 +51,10 @@ export default function PhoneApp() {
         athlete={athlete}
         onBack={() => setRoute(null)}
         onNewRecap={() => newRecap(athlete.id)}
+        onEditRecap={(recap) => {
+          setDraft({ ...recap, transcript: recap.note || '' });
+          setRoute({ name: 'edit', athleteId: athlete.id, recapId: recap.id });
+        }}
       />
     );
   } else if (route.name === 'capture') {
@@ -75,6 +79,19 @@ export default function PhoneApp() {
           const saved = saveRecap(athlete.id, finalRecap);
           setSentRecap(saved);
           setRoute({ name: 'sent', athleteId: athlete.id });
+        }}
+      />
+    );
+  } else if (route.name === 'edit') {
+    screen = (
+      <Review
+        athlete={athlete}
+        draft={draft}
+        editing
+        onBack={() => openAthlete(athlete.id)}
+        onSend={(finalRecap) => {
+          updateRecap(athlete.id, route.recapId, finalRecap);
+          openAthlete(athlete.id);
         }}
       />
     );

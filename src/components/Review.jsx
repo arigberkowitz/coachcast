@@ -51,7 +51,7 @@ function EditableList({ label, items, onChange, max }) {
   );
 }
 
-export default function Review({ athlete, draft, onBack, onSend }) {
+export default function Review({ athlete, draft, onBack, onSend, editing = false }) {
   const { brand } = useBrand();
   const [headline, setHeadline] = useState(draft.headline || '');
   const [workedOn, setWorkedOn] = useState(draft.workedOn || []);
@@ -130,12 +130,12 @@ export default function Review({ athlete, draft, onBack, onSend }) {
 
   return (
     <Screen
-      title="Review recap"
+      title={editing ? 'Edit recap' : 'Review recap'}
       onBack={onBack}
       footer={
         <PrimaryButton disabled={!parentMessage.trim() || !headline.trim() || !!busy} onClick={send}>
           <Send size={16} strokeWidth={2.25} />
-          Send to {athlete.name.split(' ')[0]}'s parent
+          {editing ? 'Save changes' : `Send to ${athlete.name.split(' ')[0]}'s parent`}
         </PrimaryButton>
       }
     >
