@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { Mic, Square, Sparkles, LoaderCircle, Keyboard, FileText } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Mic, Square, Sparkles, LoaderCircle, Keyboard, FileText, Wand2 } from 'lucide-react';
 import { T, TONES, sportById } from '../lib/sports';
-import { generateRecap, errorMessage } from '../lib/api';
+import { generateRecap, polishNote, errorMessage } from '../lib/api';
 import { useSpeech } from '../lib/useSpeech';
 import { useBrand } from '../auth/BrandContext';
 import { Avatar, SelectChip, PrimaryButton, GhostButton, Eyebrow } from './ui';
@@ -14,13 +14,72 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
   const [tone, setTone] = useState(initial?.tone || 'warm');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [polishing, setPolishing] = useState(false);
+  const [polished, setPolished] = useState(false);
+  const [rawBackup, setRawBackup] = useState(null);
 
   const { supported, listening, interim, start, stop } = useSpeech({
     onFinal: (chunk) =>
       setTranscript((t) => (t ? `${t} ${chunk}` : chunk).replace(/\s+/g, ' ')),
   });
 
-  const toggleMic = () => (listening ? stop() : start());
+  // Keep the latest transcript in a ref so the auto-polish timer reads fresh text.
+  const transcriptRef = useRef(transcript);
+  useEffect(() => {
+    transcriptRef.current = transcript;
+  }, [transcript]);
+
+  // Clean a rough/dictated note into polished writing (Wispr-style). Reversible.
+  const polish = useCallback(async () => {
+    const raw = (transcriptRef.current || '').trim();
+    if (!raw || polishing) return;
+    setPolishing(true);
+    setError('');
+    try {
+      const { text } = await polishNote(raw);
+      const clean = (text || '').trim();
+      if (clean && clean !== raw) {
+        setRawBackup(raw);
+        setTranscript(clean);
+        setPolished(true);
+      }
+    } catch (e) {
+      setError(errorMessage(e, "Couldn't polish the note — your original text is kept."));
+    } finally {
+      setPolishing(false);
+    }
+  }, [polishing]);
+
+  const undoPolish = () => {
+    if (rawBackup != null) setTranscript(rawBackup);
+    setRawBackup(null);
+    setPolished(false);
+  };
+
+  // Auto-polish once after the user explicitly stops recording (the Wispr moment).
+  const prevListening = useRef(false);
+  const userStopped = useRef(false);
+  useEffect(() => {
+    const was = prevListening.current;
+    prevListening.current = listening;
+    if (was && !listening && userStopped.current) {
+      userStopped.current = false;
+      const id = setTimeout(() => polish(), 350); // let the final speech chunk land
+      return () => clearTimeout(id);
+    }
+  }, [listening, polish]);
+
+  const toggleMic = () => {
+    if (listening) {
+      userStopped.current = true;
+      stop();
+    } else {
+      setError('');
+      setPolished(false);
+      setRawBackup(null);
+      start();
+    }
+  };
 
   const generate = async () => {
     if (!transcript.trim() || loading) return;
@@ -50,7 +109,7 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
               {error}
             </div>
           )}
-          <PrimaryButton disabled={!transcript.trim() || loading} onClick={generate}>
+          <PrimaryButton disabled={!transcript.trim() || loading || polishing} onClick={generate}>
             {loading ? (
               <>
                 <LoaderCircle size={17} strokeWidth={2.5} style={{ animation: 'cc-spin 1s linear infinite' }} />
@@ -66,7 +125,7 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
           {onSaveNote && (
             <GhostButton
               style={{ width: '100%' }}
-              disabled={!transcript.trim() || loading}
+              disabled={!transcript.trim() || loading || polishing}
               onClick={() => {
                 if (!transcript.trim()) return;
                 if (listening) stop();
@@ -119,6 +178,23 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
           <div style={{ fontSize: 15, lineHeight: 1.55, color: T.ink40, fontStyle: 'italic' }}>{interim}</div>
         )}
 
+        {(polishing || polished) && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 8, fontSize: 12.5, fontWeight: 600, color: T.accentText }}>
+            {polishing ? (
+              <>
+                <LoaderCircle size={13} style={{ animation: 'cc-spin 1s linear infinite' }} /> Polishing your dictation…
+              </>
+            ) : (
+              <>
+                <Sparkles size={13} strokeWidth={2.5} /> Polished from your dictation
+                <button type="button" onClick={undoPolish} style={{ fontWeight: 600, color: T.ink70, textDecoration: 'underline' }}>
+                  Undo
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
           <button
             type="button"
@@ -157,9 +233,21 @@ export default function Capture({ athlete, initial, onBack, onGenerated, onSaveN
             {listening ? <Square size={15} strokeWidth={2.5} fill="#fff" /> : <Mic size={16} strokeWidth={2.25} />}
             {listening ? 'Recording…' : supported ? 'Record' : 'Type your note'}
           </button>
-          <span style={{ fontSize: 11.5, color: T.ink40, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <Keyboard size={13} /> or just type
-          </span>
+          {transcript.trim() && !listening ? (
+            <button
+              type="button"
+              onClick={polish}
+              disabled={polishing}
+              title="Clean it up into polished writing"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600, color: T.accentText, opacity: polishing ? 0.5 : 1 }}
+            >
+              <Wand2 size={14} strokeWidth={2.25} /> {polished ? 'Re-polish' : 'Polish'}
+            </button>
+          ) : (
+            <span style={{ fontSize: 11.5, color: T.ink40, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <Keyboard size={13} /> or just type
+            </span>
+          )}
         </div>
       </div>
 

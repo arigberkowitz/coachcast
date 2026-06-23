@@ -66,6 +66,11 @@ export function translateRecap({ text, language }) {
   return postJSON('/api/translate', { text, language }); // { text }
 }
 
+// Cleans a rough/dictated note into polished writing (Wispr-style).
+export function polishNote(text) {
+  return postJSON('/api/polish', { text }); // { text }
+}
+
 export function summarizeAthlete({ mode, sport, athlete, recaps }) {
   return postJSON('/api/summarize', { mode, sport, athlete, recaps }); // { headline, summary }
 }
