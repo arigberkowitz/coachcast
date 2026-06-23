@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrandProvider, useBrand } from './auth/BrandContext';
 import { AuthProvider, useAuth } from './auth/AuthContext';
 import Style from './styles';
@@ -23,6 +24,11 @@ function Shell() {
 
 function ThemedApp() {
   const { brand } = useBrand();
+
+  useEffect(() => {
+    document.title = brand ? `${brand.name} — recaps parents actually read` : 'CoachCast · TutorCast';
+  }, [brand]);
+
   if (!brand) return <ChooseSide />;
 
   const a = brand.accent;

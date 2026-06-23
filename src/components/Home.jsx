@@ -201,7 +201,20 @@ export default function Home({ onOpenAthlete, onNewRecap }) {
         )}
       </div>
 
-      {filtered.length === 0 ? (
+      {athletes.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '36px 24px', border: `1px dashed ${T.lineStrong}`, borderRadius: T.r }}>
+          <div style={{ fontFamily: space.display, fontWeight: 700, fontSize: 18, color: T.ink, marginBottom: 4 }}>
+            No {peopleLower} yet
+          </div>
+          <div style={{ fontSize: 13.5, color: T.ink40, marginBottom: 16 }}>
+            Add your first {brand.person} to start sending recaps.
+          </div>
+          <PrimaryButton style={{ width: 'auto', display: 'inline-flex', padding: '11px 18px' }} onClick={() => setAdding(true)}>
+            <Plus size={17} strokeWidth={2.5} />
+            Add {brand.person}
+          </PrimaryButton>
+        </div>
+      ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '28px 20px', color: T.ink40, fontSize: 14 }}>
           No {peopleLower} match “{query}”.
         </div>
