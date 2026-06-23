@@ -144,3 +144,12 @@ export const BRANDS = {
 };
 
 export const getBrand = (id) => BRANDS[id] || BRANDS.coach;
+
+// The family/parent/student side — a read-only consumer of an athlete's progress.
+// Not a content brand (no recap creation), so it lives outside BRANDS.
+export const FAMILY = {
+  id: 'family',
+  name: 'Family',
+  accent: { accent: '#0F9E75', accentText: '#0B6B50', accentSoft: '#DCF2EA', accentSoft2: '#BFE7D9', accentGlow: 'rgba(15,158,117,.5)' },
+  chooser: { title: "I'm a parent or student", sub: "See a child's progress and homework with a code" },
+};

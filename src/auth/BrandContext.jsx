@@ -17,9 +17,10 @@ export function BrandProvider({ children }) {
     }
   });
 
-  // keep the store pointed at the active side (covers reloads)
+  // keep the store pointed at the active side (covers reloads).
+  // 'family' is a read-only consumer that resolves data by code, not a dataset mode.
   useEffect(() => {
-    if (brandId) setMode(brandId);
+    if (brandId && brandId !== 'family') setMode(brandId);
   }, [brandId]);
 
   const chooseBrand = useCallback((id) => {
@@ -28,7 +29,7 @@ export function BrandProvider({ children }) {
     } catch {
       // ignore
     }
-    setMode(id);
+    if (id !== 'family') setMode(id);
     setBrandId(id);
   }, []);
 
@@ -41,7 +42,7 @@ export function BrandProvider({ children }) {
     setBrandId(null);
   }, []);
 
-  const brand = brandId ? getBrand(brandId) : null;
+  const brand = brandId && brandId !== 'family' ? getBrand(brandId) : null;
 
   return (
     <BrandContext.Provider value={{ brand, brandId, chooseBrand, clearBrand }}>

@@ -4,6 +4,7 @@
 // touches only this file.
 import { useSyncExternalStore } from 'react';
 import { getBrand } from '../lib/brands';
+import { athleteCode } from '../lib/format';
 
 const BRAND_KEY = 'coachcast.brand'; // shared with BrandContext
 
@@ -188,4 +189,30 @@ export function deleteRecap(athleteId, recapId) {
 
 export function resetStore() {
   if (mode) setState({ athletes: getBrand(mode).seed });
+}
+
+// ---- read-only, cross-dataset lookup for the family portal ----
+// Reads a side's data without changing the active mode (coach & tutor each have
+// their own dataset). Cross-device sharing is a Phase-2 (database) upgrade; today
+// this resolves against whatever's on this device.
+function readDataset(m) {
+  const brand = getBrand(m);
+  try {
+    const raw = localStorage.getItem(brand.storeKey);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore
+  }
+  return { athletes: brand.seed };
+}
+
+export function findAthleteByCode(code) {
+  const wanted = String(code || '').trim().toUpperCase();
+  if (!wanted) return null;
+  for (const m of ['coach', 'tutor']) {
+    const data = readDataset(m);
+    const athlete = data.athletes.find((a) => athleteCode(a) === wanted);
+    if (athlete) return { athlete, mode: m };
+  }
+  return null;
 }

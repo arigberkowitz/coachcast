@@ -1,12 +1,23 @@
 import { useEffect } from 'react';
 import { BrandProvider, useBrand } from './auth/BrandContext';
 import { AuthProvider, useAuth } from './auth/AuthContext';
+import { FAMILY } from './lib/brands';
 import Style from './styles';
 import ChooseSide from './components/ChooseSide';
 import Auth from './components/Auth';
 import WebNav from './components/WebNav';
 import Phone from './components/Phone';
 import PhoneApp from './components/PhoneApp';
+import FamilyPortal from './components/FamilyPortal';
+
+const themeStyle = (a) => ({
+  '--cc-accent': a.accent,
+  '--cc-accent-text': a.accentText,
+  '--cc-accent-soft': a.accentSoft,
+  '--cc-accent-soft2': a.accentSoft2,
+  '--cc-accent-glow': a.accentGlow,
+  height: '100%',
+});
 
 function Shell() {
   const { user } = useAuth();
@@ -23,26 +34,30 @@ function Shell() {
 }
 
 function ThemedApp() {
-  const { brand } = useBrand();
+  const { brand, brandId } = useBrand();
 
   useEffect(() => {
-    document.title = brand ? `${brand.name} — recaps parents actually read` : 'CoachCast · TutorCast';
-  }, [brand]);
+    document.title = brandId === 'family'
+      ? "Family progress — CoachCast"
+      : brand
+        ? `${brand.name} — recaps parents actually read`
+        : 'CoachCast · TutorCast';
+  }, [brand, brandId]);
+
+  if (!brandId) return <ChooseSide />;
+
+  if (brandId === 'family') {
+    return (
+      <div style={themeStyle(FAMILY.accent)}>
+        <FamilyPortal />
+      </div>
+    );
+  }
 
   if (!brand) return <ChooseSide />;
 
-  const a = brand.accent;
-  const themeVars = {
-    '--cc-accent': a.accent,
-    '--cc-accent-text': a.accentText,
-    '--cc-accent-soft': a.accentSoft,
-    '--cc-accent-soft2': a.accentSoft2,
-    '--cc-accent-glow': a.accentGlow,
-    height: '100%',
-  };
-
   return (
-    <div style={themeVars}>
+    <div style={themeStyle(brand.accent)}>
       <AuthProvider brand={brand}>
         <Shell />
       </AuthProvider>

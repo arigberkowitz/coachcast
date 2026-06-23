@@ -1,11 +1,12 @@
-import { Dribbble, GraduationCap, ArrowRight, Sparkles } from 'lucide-react';
+import { Dribbble, GraduationCap, Users, ArrowRight, Sparkles } from 'lucide-react';
 import { T, space } from '../lib/sports';
-import { BRANDS } from '../lib/brands';
+import { BRANDS, FAMILY } from '../lib/brands';
 import { useBrand } from '../auth/BrandContext';
 
 const SIDES = [
   { brand: BRANDS.coach, Icon: Dribbble },
   { brand: BRANDS.tutor, Icon: GraduationCap },
+  { brand: FAMILY, Icon: Users },
 ];
 
 function SideCard({ brand, Icon, onPick }) {
@@ -15,7 +16,7 @@ function SideCard({ brand, Icon, onPick }) {
       onClick={onPick}
       style={{
         flex: 1,
-        minWidth: 240,
+        minWidth: 200,
         textAlign: 'left',
         background: T.surface,
         border: `1.5px solid ${T.line}`,
@@ -62,7 +63,7 @@ export default function ChooseSide() {
 
   return (
     <div style={{ minHeight: '100dvh', background: T.bg, display: 'grid', placeItems: 'center', padding: '32px 22px' }}>
-      <div className="cc-anim-up" style={{ width: '100%', maxWidth: 680 }}>
+      <div className="cc-anim-up" style={{ width: '100%', maxWidth: 760 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: T.ink40, marginBottom: 14 }}>
           <Sparkles size={15} color={T.ink70} /> One tool, your voice
         </div>
