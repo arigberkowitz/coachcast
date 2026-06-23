@@ -20,6 +20,7 @@ export default function EditAthleteSheet({ athlete, onClose, onDeleted }) {
   const [name, setName] = useState(athlete.name);
   const [age, setAge] = useState(String(athlete.age));
   const [sport, setSport] = useState(athlete.sport);
+  const [parentEmail, setParentEmail] = useState(athlete.parentEmail || '');
   const [confirm, setConfirm] = useState(false);
   const valid = name.trim().length > 1 && Number(age) > 0 && Number(age) < 100;
 
@@ -55,13 +56,17 @@ export default function EditAthleteSheet({ athlete, onClose, onDeleted }) {
               </SelectChip>
             ))}
           </div>
+          <div>
+            <input placeholder="Parent email (optional)" type="email" inputMode="email" autoComplete="email" value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} style={inputStyle} />
+            <div style={{ fontSize: 12, color: T.ink40, marginTop: 5, lineHeight: 1.45 }}>Used to email recaps straight from the Sent screen.</div>
+          </div>
         </div>
 
         <div style={{ marginTop: 18 }}>
           <PrimaryButton
             disabled={!valid}
             onClick={() => {
-              updateAthlete(athlete.id, { name, age, sport });
+              updateAthlete(athlete.id, { name, age, sport, parentEmail: parentEmail.trim() });
               onClose();
             }}
           >

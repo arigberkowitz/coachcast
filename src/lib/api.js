@@ -41,3 +41,16 @@ export async function summarizeAthlete({ mode, sport, athlete, recaps }) {
   if (!res.ok) throw new Error('summarize request failed');
   return res.json(); // { headline, summary }
 }
+
+// Emails a finished recap to a parent via our serverless function (Resend).
+// Throws with a human-readable message (incl. "not set up yet" when the key is absent).
+export async function sendRecapEmail({ to, subject, text }) {
+  const res = await fetch('/api/send-recap', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to, subject, text }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error || 'Could not send the email.');
+  return data; // { ok, id }
+}

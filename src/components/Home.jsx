@@ -76,6 +76,7 @@ function AddAthleteSheet({ onClose, onAdded }) {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [sport, setSport] = useState(brand.categories[0].id);
+  const [parentEmail, setParentEmail] = useState('');
   const valid = name.trim().length > 1 && Number(age) > 0 && Number(age) < 100;
 
   return (
@@ -127,13 +128,22 @@ function AddAthleteSheet({ onClose, onAdded }) {
               </SelectChip>
             ))}
           </div>
+          <input
+            placeholder="Parent email (optional)"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={parentEmail}
+            onChange={(e) => setParentEmail(e.target.value)}
+            style={inputStyle}
+          />
         </div>
 
         <div style={{ marginTop: 18 }}>
           <PrimaryButton
             disabled={!valid}
             onClick={() => {
-              const a = addAthlete({ name, age, sport });
+              const a = addAthlete({ name, age, sport, parentEmail });
               onAdded(a);
             }}
           >

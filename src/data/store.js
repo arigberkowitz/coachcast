@@ -96,8 +96,8 @@ export function saveRecap(athleteId, recap) {
   return full;
 }
 
-export function addAthlete({ name, age, sport }) {
-  const a = { id: uid(), name: name.trim(), age: Number(age), sport, recaps: [] };
+export function addAthlete({ name, age, sport, parentEmail = '' }) {
+  const a = { id: uid(), name: name.trim(), age: Number(age), sport, parentEmail: parentEmail.trim(), recaps: [] };
   setState({ ...state, athletes: [...state.athletes, a] });
   return a;
 }

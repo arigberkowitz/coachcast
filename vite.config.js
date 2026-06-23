@@ -1,5 +1,7 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 // Dev-only: serve any /api/<name> from the SAME handler file Vercel uses, so
 // `npm run dev` exercises the full flow without needing `vercel dev`. The key is
@@ -16,8 +18,13 @@ function devApi(env) {
         const name = req.url.split('?')[0].replace(/^\/api\//, '').replace(/\/+$/, '')
         if (!/^[a-z0-9-]+$/.test(name)) return next() // no path traversal
 
-        // make the env var visible to the serverless handler in dev
-        if (env.ANTHROPIC_API_KEY) process.env.ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY
+        // resolve handlers against the project root (config may be bundled to a temp dir)
+        const handlerUrl = pathToFileURL(path.resolve(server.config.root, 'api', `${name}.js`)).href
+
+        // make server-side env vars visible to the serverless handler in dev
+        for (const k of ['ANTHROPIC_API_KEY', 'RESEND_API_KEY', 'RECAP_FROM']) {
+          if (env[k]) process.env[k] = env[k]
+        }
 
         let raw = ''
         for await (const chunk of req) raw += chunk
@@ -39,7 +46,7 @@ function devApi(env) {
         }
 
         try {
-          const mod = await import(`./api/${name}.js`)
+          const mod = await import(handlerUrl)
           await mod.default(req, res)
         } catch (e) {
           if (!res.writableEnded) {
