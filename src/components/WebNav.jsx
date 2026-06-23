@@ -1,12 +1,18 @@
 import { Sparkles, LogOut } from 'lucide-react';
 import { T, space } from '../lib/sports';
 import { useAuth } from '../auth/AuthContext';
+import { useBrand } from '../auth/BrandContext';
 import { Avatar, IconButton } from './ui';
 import { useMedia } from '../lib/useMedia';
 
 export default function WebNav() {
   const { user, signOut } = useAuth();
+  const { brand, clearBrand } = useBrand();
   const narrow = useMedia('(max-width: 560px)');
+  const leave = () => {
+    signOut();
+    clearBrand();
+  };
 
   return (
     <header
@@ -35,7 +41,7 @@ export default function WebNav() {
             display: 'grid',
             placeItems: 'center',
             color: '#fff',
-            boxShadow: '0 6px 14px -6px rgba(255,90,44,.9)',
+            boxShadow: `0 6px 14px -6px ${T.accentGlow}`,
           }}
         >
           <Sparkles size={16} />
@@ -49,7 +55,7 @@ export default function WebNav() {
             color: T.ink,
           }}
         >
-          CoachCast
+          {brand.name}
         </span>
       </div>
 
@@ -61,7 +67,7 @@ export default function WebNav() {
           </div>
         )}
         <Avatar name={user.name} size={36} />
-        <IconButton label="Sign out" onClick={signOut}>
+        <IconButton label="Sign out" onClick={leave}>
           <LogOut size={18} strokeWidth={2} />
         </IconButton>
       </div>

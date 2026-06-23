@@ -8,11 +8,12 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
-const SESSION_KEY = 'coachcast.session.v1';
+// Session is keyed per side, so the coach and tutor have separate sign-ins.
+const sessionKey = (brand) => `coachcast.session.${brand?.id || 'x'}.v1`;
 
-function loadSession() {
+function loadSession(brand) {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = sessionStorage.getItem(sessionKey(brand));
     if (raw) return JSON.parse(raw);
   } catch {
     // ignore
@@ -29,8 +30,8 @@ function nameFromEmail(email) {
     .join(' ') || 'Coach';
 }
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(loadSession);
+export function AuthProvider({ brand, children }) {
+  const [user, setUser] = useState(() => loadSession(brand));
 
   const signIn = useCallback(({ email, password }) => {
     // Demo validation only — mirrors the prototype. No real auth in phase 1.
@@ -42,22 +43,22 @@ export function AuthProvider({ children }) {
     }
     const u = { email: trimmed, name: nameFromEmail(trimmed) };
     try {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(u));
+      sessionStorage.setItem(sessionKey(brand), JSON.stringify(u));
     } catch {
       // ignore
     }
     setUser(u);
     return { ok: true };
-  }, []);
+  }, [brand]);
 
   const signOut = useCallback(() => {
     try {
-      sessionStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(sessionKey(brand));
     } catch {
       // ignore
     }
     setUser(null);
-  }, []);
+  }, [brand]);
 
   return (
     <AuthContext.Provider value={{ user, signIn, signOut }}>

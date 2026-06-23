@@ -2,11 +2,12 @@
 // It calls OUR serverless function (/api/generate-recap) — never api.anthropic.com.
 // The API key lives server-side only.
 
-export async function generateRecap({ sport, tone, athlete, transcript }) {
+export async function generateRecap({ mode, sport, tone, athlete, transcript }) {
   const res = await fetch('/api/generate-recap', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      mode,
       sport,
       tone,
       athlete: {
@@ -31,11 +32,11 @@ export async function translateRecap({ text, language }) {
   return res.json(); // { text }
 }
 
-export async function summarizeAthlete({ sport, athlete, recaps }) {
+export async function summarizeAthlete({ mode, sport, athlete, recaps }) {
   const res = await fetch('/api/summarize', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sport, athlete, recaps }),
+    body: JSON.stringify({ mode, sport, athlete, recaps }),
   });
   if (!res.ok) throw new Error('summarize request failed');
   return res.json(); // { headline, summary }

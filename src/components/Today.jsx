@@ -3,6 +3,7 @@ import { Mic, Flame, ChevronRight, CircleCheck, Clock, ArrowRight } from 'lucide
 import { T, space, sportById } from '../lib/sports';
 import { useStore } from '../data/store';
 import { useAuth } from '../auth/AuthContext';
+import { useBrand } from '../auth/BrandContext';
 import { relativeDate } from '../lib/format';
 import {
   recapsThisWeek,
@@ -64,7 +65,7 @@ function DueRow({ athlete, lastTs, onNewRecap }) {
         onClick={onNewRecap}
         aria-label={`New recap for ${athlete.name}`}
         title="New recap"
-        style={{ width: 38, height: 38, flexShrink: 0, display: 'grid', placeItems: 'center', borderRadius: 11, background: T.accent, color: '#fff', boxShadow: '0 6px 14px -7px rgba(255,90,44,.9)' }}
+        style={{ width: 38, height: 38, flexShrink: 0, display: 'grid', placeItems: 'center', borderRadius: 11, background: T.accent, color: '#fff', boxShadow: `0 6px 14px -7px ${T.accentGlow}` }}
       >
         <Mic size={17} strokeWidth={2.25} />
       </button>
@@ -98,6 +99,7 @@ function RecentRow({ recap, onOpen }) {
 export default function Today({ onNewRecap, onOpenAthlete }) {
   const { athletes } = useStore();
   const { user } = useAuth();
+  const { brand } = useBrand();
   const [picking, setPicking] = useState(false);
 
   const due = dueAthletes(athletes);
@@ -128,7 +130,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
           borderRadius: T.rLg,
           background: T.accent,
           color: '#fff',
-          boxShadow: '0 14px 30px -14px rgba(255,90,44,.9)',
+          boxShadow: `0 14px 30px -14px ${T.accentGlow}`,
           transition: 'transform .12s ease',
           marginBottom: 20,
         }}
@@ -142,7 +144,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
         <span style={{ flex: 1 }}>
           <span style={{ display: 'block', fontFamily: space.display, fontWeight: 700, fontSize: 17 }}>New recap</span>
           <span style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,.9)', marginTop: 1 }}>
-            Pick an athlete and talk for 20 seconds.
+            Pick {/^[aeiou]/i.test(brand.person) ? 'an' : 'a'} {brand.person} and talk for 20 seconds.
           </span>
         </span>
         <ArrowRight size={20} strokeWidth={2.25} />
@@ -152,7 +154,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
       <Eyebrow style={{ marginBottom: 8 }}>This week</Eyebrow>
       <div style={{ display: 'flex', gap: 9, marginBottom: 22 }}>
         <Metric value={week} label={week === 1 ? 'recap sent' : 'recaps sent'} icon={<Mic size={15} strokeWidth={2.25} />} />
-        <Metric value={athletesRecappedThisWeek(athletes)} label="athletes" icon={<CircleCheck size={15} strokeWidth={2.25} />} />
+        <Metric value={athletesRecappedThisWeek(athletes)} label={brand.personPlural.toLowerCase()} icon={<CircleCheck size={15} strokeWidth={2.25} />} />
         <Metric value={streak} label={streak === 1 ? 'week streak' : 'week streak'} icon={<Flame size={15} strokeWidth={2.25} />} />
       </div>
 

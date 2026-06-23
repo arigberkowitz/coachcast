@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Mic, Square, Sparkles, LoaderCircle, Keyboard } from 'lucide-react';
-import { T, SPORTS, TONES, sportById } from '../lib/sports';
+import { T, TONES, sportById } from '../lib/sports';
 import { generateRecap } from '../lib/api';
 import { useSpeech } from '../lib/useSpeech';
+import { useBrand } from '../auth/BrandContext';
 import { Avatar, SelectChip, PrimaryButton, Eyebrow } from './ui';
 import Screen from './Screen';
 
 export default function Capture({ athlete, initial, onBack, onGenerated }) {
+  const { brand } = useBrand();
   const [transcript, setTranscript] = useState(initial?.transcript || '');
   const [sport, setSport] = useState(initial?.sport || athlete.sport);
   const [tone, setTone] = useState(initial?.tone || 'warm');
@@ -26,7 +28,7 @@ export default function Capture({ athlete, initial, onBack, onGenerated }) {
     setError('');
     setLoading(true);
     try {
-      const recap = await generateRecap({ sport, tone, athlete, transcript });
+      const recap = await generateRecap({ mode: brand.id, sport, tone, athlete, transcript });
       onGenerated(recap, { sport, tone, transcript: transcript.trim() });
     } catch {
       setError("Couldn't write the recap. Check your connection and try again.");
@@ -147,10 +149,10 @@ export default function Capture({ athlete, initial, onBack, onGenerated }) {
         </div>
       </div>
 
-      {/* sport */}
-      <Eyebrow style={{ margin: '20px 0 8px' }}>Sport</Eyebrow>
+      {/* category (sport or subject) */}
+      <Eyebrow style={{ margin: '20px 0 8px' }}>{brand.categoryLabel}</Eyebrow>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-        {SPORTS.map((sp) => (
+        {brand.categories.map((sp) => (
           <SelectChip key={sp.id} active={sport === sp.id} onClick={() => setSport(sp.id)}>
             <sp.Icon size={14} strokeWidth={2.25} color={sport === sp.id ? T.accent : T.ink40} />
             {sp.label}

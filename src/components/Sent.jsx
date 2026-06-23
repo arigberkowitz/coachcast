@@ -26,7 +26,7 @@ export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
             background: T.accent,
             display: 'grid',
             placeItems: 'center',
-            boxShadow: '0 16px 32px -12px rgba(255,90,44,.8)',
+            boxShadow: `0 16px 32px -12px ${T.accentGlow}`,
             animation: 'cc-pop .5s cubic-bezier(.22,.8,.3,1) backwards',
           }}
         >

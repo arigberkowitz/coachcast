@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle } from 'lucide-react';
 import { T, space, sportById, TONES } from '../lib/sports';
 import { generateRecap, translateRecap } from '../lib/api';
+import { useBrand } from '../auth/BrandContext';
 import { Avatar, PrimaryButton, Eyebrow, SelectChip } from './ui';
 import Screen from './Screen';
 
@@ -51,6 +52,7 @@ function EditableList({ label, items, onChange, max }) {
 }
 
 export default function Review({ athlete, draft, onBack, onSend }) {
+  const { brand } = useBrand();
   const [headline, setHeadline] = useState(draft.headline || '');
   const [workedOn, setWorkedOn] = useState(draft.workedOn || []);
   const [improved, setImproved] = useState(draft.improved || []);
@@ -73,7 +75,7 @@ export default function Review({ athlete, draft, onBack, onSend }) {
     setError('');
     setBusy('regen');
     try {
-      const r = await generateRecap({ sport: draft.sport || athlete.sport, tone: newTone, athlete, transcript: draft.transcript });
+      const r = await generateRecap({ mode: brand.id, sport: draft.sport || athlete.sport, tone: newTone, athlete, transcript: draft.transcript });
       setHeadline(r.headline || '');
       setWorkedOn(r.workedOn || []);
       setImproved(r.improved || []);
@@ -193,9 +195,9 @@ export default function Review({ athlete, draft, onBack, onSend }) {
           style={{ width: '100%', fontFamily: space.display, fontWeight: 700, fontSize: 21, letterSpacing: '-.01em', color: T.ink, border: 'none', outline: 'none', background: 'transparent', borderBottom: `1.5px dashed ${T.line}`, paddingBottom: 6 }}
         />
 
-        <EditableList label="Worked on" items={workedOn} onChange={setWorkedOn} max={3} />
-        <EditableList label="Improved" items={improved} onChange={setImproved} max={3} />
-        <EditableList label="Up next" items={nextFocus} onChange={setNextFocus} max={2} />
+        <EditableList label={brand.recap.workedOn} items={workedOn} onChange={setWorkedOn} max={3} />
+        <EditableList label={brand.recap.improved} items={improved} onChange={setImproved} max={3} />
+        <EditableList label={brand.recap.nextFocus} items={nextFocus} onChange={setNextFocus} max={2} />
 
         {/* parent message + translate */}
         <div style={{ marginTop: 22 }}>

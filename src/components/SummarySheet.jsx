@@ -3,10 +3,12 @@ import { X, Copy, Check, LoaderCircle, Sparkles } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtDate } from '../lib/format';
 import { summarizeAthlete } from '../lib/api';
+import { useBrand } from '../auth/BrandContext';
 import { IconButton } from './ui';
 
 // Bottom sheet: a parent-facing progress summary across the athlete's recent recaps.
 export default function SummarySheet({ athlete, onClose }) {
+  const { brand } = useBrand();
   const [state, setState] = useState({ loading: true, error: '', data: null });
   const [copied, setCopied] = useState(false);
 
@@ -15,6 +17,7 @@ export default function SummarySheet({ athlete, onClose }) {
     (async () => {
       try {
         const data = await summarizeAthlete({
+          mode: brand.id,
           sport: athlete.sport,
           athlete: { firstName: athlete.name.split(' ')[0], age: athlete.age },
           recaps: athlete.recaps.slice(0, 8).map((r) => ({
@@ -29,7 +32,7 @@ export default function SummarySheet({ athlete, onClose }) {
       }
     })();
     return () => { alive = false; };
-  }, [athlete]);
+  }, [athlete, brand.id]);
 
   const copy = async () => {
     if (!state.data) return;

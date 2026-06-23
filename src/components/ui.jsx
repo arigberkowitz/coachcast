@@ -74,7 +74,7 @@ export function PrimaryButton({ children, style, ...props }) {
         color: '#fff',
         fontWeight: 600,
         fontSize: 15,
-        boxShadow: props.disabled ? 'none' : '0 8px 20px -8px rgba(255,90,44,.7)',
+        boxShadow: props.disabled ? 'none' : `0 8px 20px -8px ${T.accentGlow}`,
         transition: 'transform .12s ease, filter .15s ease, background .15s ease',
         ...style,
       }}

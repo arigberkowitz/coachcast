@@ -1,12 +1,13 @@
 import { Sparkles, Users } from 'lucide-react';
 import { T } from '../lib/sports';
-
-const TABS = [
-  { id: 'today', label: 'Today', Icon: Sparkles },
-  { id: 'athletes', label: 'Athletes', Icon: Users },
-];
+import { useBrand } from '../auth/BrandContext';
 
 export default function TabBar({ active, onChange }) {
+  const { brand } = useBrand();
+  const TABS = [
+    { id: 'today', label: 'Today', Icon: Sparkles },
+    { id: 'athletes', label: brand.personPlural, Icon: Users },
+  ];
   return (
     <nav
       style={{

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Plus, ChevronRight, Mic, X, Search } from 'lucide-react';
-import { T, space, sportById, SPORTS } from '../lib/sports';
+import { T, space, sportById } from '../lib/sports';
 import { useStore, addAthlete } from '../data/store';
+import { useBrand } from '../auth/BrandContext';
 import { relativeDate } from '../lib/format';
 import { Avatar, IconButton, SelectChip, PrimaryButton } from './ui';
 import Screen from './Screen';
@@ -71,9 +72,10 @@ function AthleteRow({ athlete, onOpen, onNewRecap }) {
 }
 
 function AddAthleteSheet({ onClose, onAdded }) {
+  const { brand } = useBrand();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [sport, setSport] = useState(SPORTS[0].id);
+  const [sport, setSport] = useState(brand.categories[0].id);
   const valid = name.trim().length > 1 && Number(age) > 0 && Number(age) < 100;
 
   return (
@@ -95,7 +97,7 @@ function AddAthleteSheet({ onClose, onAdded }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
           <h3 style={{ fontFamily: space.display, fontWeight: 700, fontSize: 19, letterSpacing: '-.01em' }}>
-            Add athlete
+            Add {brand.person}
           </h3>
           <IconButton label="Close" onClick={onClose} style={{ marginRight: -6 }}>
             <X size={20} />
@@ -118,7 +120,7 @@ function AddAthleteSheet({ onClose, onAdded }) {
             style={inputStyle}
           />
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {SPORTS.map((s) => (
+            {brand.categories.map((s) => (
               <SelectChip key={s.id} active={sport === s.id} onClick={() => setSport(s.id)}>
                 <s.Icon size={14} strokeWidth={2.25} color={sport === s.id ? T.accent : T.ink40} />
                 {s.label}
@@ -136,7 +138,7 @@ function AddAthleteSheet({ onClose, onAdded }) {
             }}
           >
             <Plus size={17} strokeWidth={2.5} />
-            Add athlete
+            Add {brand.person}
           </PrimaryButton>
         </div>
       </div>
@@ -155,17 +157,19 @@ const inputStyle = {
 
 export default function Home({ onOpenAthlete, onNewRecap }) {
   const { athletes } = useStore();
+  const { brand } = useBrand();
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState('');
 
+  const peopleLower = brand.personPlural.toLowerCase();
   const q = query.trim().toLowerCase();
   const filtered = q ? athletes.filter((a) => a.name.toLowerCase().includes(q)) : athletes;
 
   return (
     <Screen
-      title="Athletes"
+      title={brand.personPlural}
       action={
-        <IconButton label="Add athlete" onClick={() => setAdding(true)} style={{ marginRight: -6 }}>
+        <IconButton label={`Add ${brand.person}`} onClick={() => setAdding(true)} style={{ marginRight: -6 }}>
           <Plus size={22} strokeWidth={2.25} color={T.accent} />
         </IconButton>
       }
@@ -186,8 +190,8 @@ export default function Home({ onOpenAthlete, onNewRecap }) {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search athletes"
-          aria-label="Search athletes"
+          placeholder={`Search ${peopleLower}`}
+          aria-label={`Search ${peopleLower}`}
           style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 15, color: T.ink }}
         />
         {query && (
@@ -199,7 +203,7 @@ export default function Home({ onOpenAthlete, onNewRecap }) {
 
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '28px 20px', color: T.ink40, fontSize: 14 }}>
-          No athletes match “{query}”.
+          No {peopleLower} match “{query}”.
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

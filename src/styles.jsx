@@ -5,6 +5,16 @@
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Inter:wght@400;500;600;700&display=swap');
 
+/* Default accent (coach / coral). The active brand overrides these on its root
+   wrapper, so the whole app reskins by swapping four variables. */
+:root {
+  --cc-accent: #FF5A2C;
+  --cc-accent-text: #C5400F;
+  --cc-accent-soft: #FFEDE5;
+  --cc-accent-soft2: #FFDDCF;
+  --cc-accent-glow: rgba(255,90,44,.7);
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 
@@ -25,13 +35,13 @@ button:disabled { cursor: not-allowed; }
 textarea { resize: none; }
 a { color: inherit; }
 
-::selection { background: #FF5A2C; color: #fff; }
+::selection { background: var(--cc-accent); color: #fff; }
 
 input::placeholder, textarea::placeholder { color: #B4AA9B; }
 
 /* Focus: visible only for keyboard users, in the coral accent. */
 :focus { outline: none; }
-:focus-visible { outline: 2.5px solid #FF5A2C; outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 2.5px solid var(--cc-accent); outline-offset: 2px; border-radius: 6px; }
 
 /* Quiet warm scrollbars inside the phone. */
 .cc-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
