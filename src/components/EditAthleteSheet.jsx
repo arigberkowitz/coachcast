@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { X, Trash2, Copy, Check, Share2 } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { T, space } from '../lib/sports';
-import { athleteCode } from '../lib/format';
 import { useBrand } from '../auth/BrandContext';
-import { useCopy } from '../lib/useCopy';
 import { updateAthlete, deleteAthlete } from '../data/store';
 import { IconButton, SelectChip, PrimaryButton } from './ui';
 
@@ -24,8 +22,6 @@ export default function EditAthleteSheet({ athlete, onClose, onDeleted }) {
   const [sport, setSport] = useState(athlete.sport);
   const [confirm, setConfirm] = useState(false);
   const valid = name.trim().length > 1 && Number(age) > 0 && Number(age) < 100;
-  const code = athleteCode(athlete);
-  const { copied, copy } = useCopy();
 
   return (
     <div className="cc-anim-in" style={{ position: 'absolute', inset: 0, zIndex: 40, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
@@ -61,24 +57,7 @@ export default function EditAthleteSheet({ athlete, onClose, onDeleted }) {
           </div>
         </div>
 
-        {/* family code to share with the parent/student */}
-        <div style={{ marginTop: 14, padding: '11px 13px', borderRadius: T.r, background: T.surfaceAlt, border: `1px solid ${T.line}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: T.ink40, marginBottom: 6 }}>
-            <Share2 size={13} /> Family code
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-            <span style={{ fontFamily: space.display, fontWeight: 700, fontSize: 18, letterSpacing: '.02em', color: T.ink }}>{code}</span>
-            <button onClick={() => copy(code)} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12.5, fontWeight: 600, color: copied ? T.accentText : T.ink70, border: `1px solid ${T.line}`, background: T.surface, borderRadius: 9, padding: '6px 10px' }}>
-              {copied ? <Check size={14} strokeWidth={2.5} color={T.accent} /> : <Copy size={14} strokeWidth={2.25} />}
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-          </div>
-          <div style={{ fontSize: 12, color: T.ink40, marginTop: 6, lineHeight: 1.45 }}>
-            Share with {name.split(' ')[0] || 'the'} family — they enter it in the parent/student view to follow progress.
-          </div>
-        </div>
-
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 18 }}>
           <PrimaryButton
             disabled={!valid}
             onClick={() => {

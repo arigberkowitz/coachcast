@@ -10,6 +10,7 @@ import Screen from './Screen';
 import SummarySheet from './SummarySheet';
 import EditAthleteSheet from './EditAthleteSheet';
 import Goals from './Goals';
+import FamilyAccessCard from './FamilyAccessCard';
 
 function CardAction({ children, onClick, danger, accent }) {
   return (
@@ -264,6 +265,8 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap, 
       </div>
 
       <Goals athlete={athlete} />
+
+      <FamilyAccessCard athlete={athlete} />
 
       {sentCount >= 2 && (
         <button
