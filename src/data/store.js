@@ -143,6 +143,40 @@ export function deleteAthlete(id) {
   setState({ ...state, athletes: state.athletes.filter((a) => a.id !== id) });
 }
 
+export function addGoal(athleteId, text) {
+  const g = { id: uid(), text: text.trim(), createdAt: new Date().toISOString(), achievedAt: null };
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) => (a.id !== athleteId ? a : { ...a, goals: [...(a.goals || []), g] })),
+  });
+  return g;
+}
+
+export function toggleGoal(athleteId, goalId) {
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) =>
+      a.id !== athleteId
+        ? a
+        : {
+            ...a,
+            goals: (a.goals || []).map((g) =>
+              g.id !== goalId ? g : { ...g, achievedAt: g.achievedAt ? null : new Date().toISOString() },
+            ),
+          },
+    ),
+  });
+}
+
+export function deleteGoal(athleteId, goalId) {
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) =>
+      a.id !== athleteId ? a : { ...a, goals: (a.goals || []).filter((g) => g.id !== goalId) },
+    ),
+  });
+}
+
 export function deleteRecap(athleteId, recapId) {
   setState({
     ...state,

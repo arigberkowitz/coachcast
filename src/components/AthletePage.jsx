@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2 } from 'lucide-react';
+import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2, FileText, Send } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { fmtFullDate, relativeDate } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
-import { deleteRecap } from '../data/store';
+import { deleteRecap, updateRecap } from '../data/store';
 import { Avatar, PrimaryButton, Eyebrow, IconButton } from './ui';
 import Screen from './Screen';
 import SummarySheet from './SummarySheet';
 import EditAthleteSheet from './EditAthleteSheet';
+import Goals from './Goals';
 
-function CardAction({ children, onClick, danger }) {
+function CardAction({ children, onClick, danger, accent }) {
   return (
     <button
       onClick={onClick}
@@ -19,7 +20,7 @@ function CardAction({ children, onClick, danger }) {
         gap: 5,
         fontSize: 12.5,
         fontWeight: 600,
-        color: danger ? '#B23B2E' : T.ink40,
+        color: accent ? T.accentText : danger ? '#B23B2E' : T.ink40,
         padding: '5px 8px',
         borderRadius: 8,
         transition: 'background .15s ease, color .15s ease',
@@ -77,9 +78,15 @@ function RecapCard({ recap, index, athleteId, onEdit }) {
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 12, fontWeight: 600, color: T.ink40 }}>{fmtFullDate(recap.createdAt)}</span>
-        <span style={{ fontSize: 11.5, color: T.ink40, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-          <CheckCheck size={13} color={T.accent} strokeWidth={2.5} /> Sent
-        </span>
+        {recap.sent === false ? (
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#8A5A07', background: '#FCE9C4', borderRadius: 999, padding: '2px 9px', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <FileText size={11} strokeWidth={2.5} /> Draft
+          </span>
+        ) : (
+          <span style={{ fontSize: 11.5, color: T.ink40, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <CheckCheck size={13} color={T.accent} strokeWidth={2.5} /> Sent
+          </span>
+        )}
       </div>
       <h3
         style={{
@@ -126,6 +133,11 @@ function RecapCard({ recap, index, athleteId, onEdit }) {
           </>
         ) : (
           <>
+            {recap.sent === false && (
+              <CardAction accent onClick={() => updateRecap(athleteId, recap.id, { sent: true })}>
+                <Send size={14} strokeWidth={2.25} /> Send now
+              </CardAction>
+            )}
             <CardAction onClick={() => copy(recap.parentMessage)}>
               {copied ? <Check size={14} strokeWidth={2.5} color={T.accent} /> : <Copy size={14} strokeWidth={2.25} />}
               {copied ? 'Copied' : 'Copy'}
@@ -148,6 +160,8 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
   const Icon = s.Icon;
   const [summarizing, setSummarizing] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
+  const sentCount = athlete.recaps.filter((r) => r.sent !== false).length;
+  const lastSent = athlete.recaps.find((r) => r.sent !== false);
 
   return (
     <Screen
@@ -189,13 +203,15 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
           border: `1px solid ${T.line}`,
         }}
       >
-        <Stat value={athlete.recaps.length} label={athlete.recaps.length === 1 ? 'recap sent' : 'recaps sent'} />
+        <Stat value={sentCount} label={sentCount === 1 ? 'recap sent' : 'recaps sent'} />
         <div style={{ width: 1, background: T.line }} />
         <Stat
-          value={athlete.recaps[0] ? relativeDate(athlete.recaps[0].createdAt) : '—'}
+          value={lastSent ? relativeDate(lastSent.createdAt) : '—'}
           label="last session"
         />
       </div>
+
+      <Goals athlete={athlete} />
 
       {athlete.recaps.length >= 2 && (
         <button

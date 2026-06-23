@@ -10,7 +10,26 @@ const initials = (name) =>
     .join('')
     .toUpperCase();
 
+// Soft, warm-leaning tints so each person reads as their own — varied but calm,
+// and harmonious with the cream surfaces. Action colors stay the brand accent.
+const AVATAR_TINTS = [
+  ['#FFD9C7', '#B23E16'], // peach
+  ['#FCE2B0', '#8A5A07'], // amber
+  ['#F7D2DD', '#A33A5C'], // rose
+  ['#D9EAC8', '#4C7234'], // sage
+  ['#CFE3F5', '#2C5C8A'], // sky
+  ['#E3DCF6', '#54409A'], // lavender
+  ['#CFECE1', '#1E6E55'], // teal
+];
+
+function tintFor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return AVATAR_TINTS[h % AVATAR_TINTS.length];
+}
+
 export function Avatar({ name, size = 44 }) {
+  const [bg, fg] = tintFor(name);
   return (
     <div
       aria-hidden
@@ -21,8 +40,8 @@ export function Avatar({ name, size = 44 }) {
         flexShrink: 0,
         display: 'grid',
         placeItems: 'center',
-        background: T.accentSoft,
-        color: T.accentText,
+        background: bg,
+        color: fg,
         fontFamily: space.display,
         fontWeight: 700,
         fontSize: size * 0.36,

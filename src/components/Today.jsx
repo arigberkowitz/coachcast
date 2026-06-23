@@ -5,6 +5,7 @@ import { useStore } from '../data/store';
 import { useAuth } from '../auth/AuthContext';
 import { useBrand } from '../auth/BrandContext';
 import { relativeDate } from '../lib/format';
+import { useCountUp } from '../lib/useCountUp';
 import {
   recapsThisWeek,
   athletesRecappedThisWeek,
@@ -25,11 +26,12 @@ function greeting() {
 }
 
 function Metric({ value, label, icon }) {
+  const display = useCountUp(value);
   return (
     <div style={{ flex: 1, background: T.surfaceAlt, border: `1px solid ${T.line}`, borderRadius: T.r, padding: '12px 12px 11px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: T.accent, marginBottom: 5 }}>{icon}</div>
       <div style={{ fontFamily: space.display, fontWeight: 700, fontSize: 24, lineHeight: 1, letterSpacing: '-.02em', color: T.ink }}>
-        {value}
+        {display}
       </div>
       <div style={{ fontSize: 11.5, color: T.ink40, marginTop: 4 }}>{label}</div>
     </div>

@@ -80,6 +80,10 @@ export default function PhoneApp() {
           setSentRecap(saved);
           setRoute({ name: 'sent', athleteId: athlete.id });
         }}
+        onSaveDraft={(draftRecap) => {
+          saveRecap(athlete.id, { ...draftRecap, sent: false });
+          openAthlete(athlete.id);
+        }}
       />
     );
   } else if (route.name === 'edit') {

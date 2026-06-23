@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle } from 'lucide-react';
+import { Send, Plus, X, Check, Pencil, RotateCw, Languages, LoaderCircle, FileText } from 'lucide-react';
 import { T, space, sportById, TONES } from '../lib/sports';
 import { generateRecap, translateRecap } from '../lib/api';
 import { useBrand } from '../auth/BrandContext';
-import { Avatar, PrimaryButton, Eyebrow, SelectChip } from './ui';
+import { Avatar, PrimaryButton, GhostButton, Eyebrow, SelectChip } from './ui';
 import Screen from './Screen';
 
 const LANGUAGES = ['Spanish', 'French', 'Portuguese', 'Mandarin', 'Vietnamese'];
@@ -51,7 +51,7 @@ function EditableList({ label, items, onChange, max }) {
   );
 }
 
-export default function Review({ athlete, draft, onBack, onSend, editing = false }) {
+export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, editing = false }) {
   const { brand } = useBrand();
   const [headline, setHeadline] = useState(draft.headline || '');
   const [workedOn, setWorkedOn] = useState(draft.workedOn || []);
@@ -115,28 +115,37 @@ export default function Review({ athlete, draft, onBack, onSend, editing = false
     setTranslatedTo(null);
   };
 
-  const send = () => {
-    onSend({
-      ...draft,
-      tone,
-      headline: headline.trim(),
-      workedOn: workedOn.map((x) => x.trim()).filter(Boolean),
-      improved: improved.map((x) => x.trim()).filter(Boolean),
-      nextFocus: nextFocus.map((x) => x.trim()).filter(Boolean),
-      parentMessage: parentMessage.trim(),
-      language: translatedTo || 'English',
-    });
-  };
+  const build = () => ({
+    ...draft,
+    tone,
+    headline: headline.trim(),
+    workedOn: workedOn.map((x) => x.trim()).filter(Boolean),
+    improved: improved.map((x) => x.trim()).filter(Boolean),
+    nextFocus: nextFocus.map((x) => x.trim()).filter(Boolean),
+    parentMessage: parentMessage.trim(),
+    language: translatedTo || 'English',
+  });
+
+  const send = () => onSend(build());
+  const disabled = !parentMessage.trim() || !headline.trim() || !!busy;
 
   return (
     <Screen
       title={editing ? 'Edit recap' : 'Review recap'}
       onBack={onBack}
       footer={
-        <PrimaryButton disabled={!parentMessage.trim() || !headline.trim() || !!busy} onClick={send}>
-          <Send size={16} strokeWidth={2.25} />
-          {editing ? 'Save changes' : `Send to ${athlete.name.split(' ')[0]}'s parent`}
-        </PrimaryButton>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {onSaveDraft && !editing && (
+            <GhostButton style={{ width: '100%' }} disabled={disabled} onClick={() => onSaveDraft(build())}>
+              <FileText size={15} strokeWidth={2.25} />
+              Save as draft
+            </GhostButton>
+          )}
+          <PrimaryButton disabled={disabled} onClick={send}>
+            <Send size={16} strokeWidth={2.25} />
+            {editing ? 'Save changes' : `Send to ${athlete.name.split(' ')[0]}'s parent`}
+          </PrimaryButton>
+        </div>
       }
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 14 }}>

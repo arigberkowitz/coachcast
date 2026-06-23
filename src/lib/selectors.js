@@ -4,6 +4,10 @@
 const WEEK_MS = 7 * 86400000;
 export const DUE_DAYS = 7;
 
+// Drafts (sent === false) don't count as sent activity. Seed/legacy recaps have no
+// `sent` field and are treated as sent.
+export const isSent = (r) => r.sent !== false;
+
 export function startOfWeek(date) {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
@@ -19,34 +23,35 @@ export function allRecaps(athletes) {
     .sort((x, y) => new Date(y.createdAt) - new Date(x.createdAt));
 }
 
+// Recent SENT activity (drafts excluded).
 export function recentRecaps(athletes, n = 6) {
-  return allRecaps(athletes).slice(0, n);
+  return allRecaps(athletes).filter(isSent).slice(0, n);
 }
 
 export function lastRecapTime(athlete) {
-  if (!athlete.recaps.length) return null;
-  return Math.max(...athlete.recaps.map((r) => new Date(r.createdAt).getTime()));
+  const times = athlete.recaps.filter(isSent).map((r) => new Date(r.createdAt).getTime());
+  return times.length ? Math.max(...times) : null;
 }
 
 export function recapsThisWeek(athletes, now = Date.now()) {
   const start = startOfWeek(now).getTime();
-  return allRecaps(athletes).filter((r) => new Date(r.createdAt).getTime() >= start).length;
+  return allRecaps(athletes).filter((r) => isSent(r) && new Date(r.createdAt).getTime() >= start).length;
 }
 
 export function athletesRecappedThisWeek(athletes, now = Date.now()) {
   const start = startOfWeek(now).getTime();
   const ids = new Set(
     allRecaps(athletes)
-      .filter((r) => new Date(r.createdAt).getTime() >= start)
+      .filter((r) => isSent(r) && new Date(r.createdAt).getTime() >= start)
       .map((r) => r.athlete.id),
   );
   return ids.size;
 }
 
-// Consecutive weeks (ending at the most recent week with a recap) that have >=1 recap.
+// Consecutive weeks (ending at the most recent week with a recap) that have >=1 sent recap.
 export function weekStreak(athletes, now = Date.now()) {
   const weeks = new Set(
-    allRecaps(athletes).map((r) => startOfWeek(r.createdAt).getTime()),
+    allRecaps(athletes).filter(isSent).map((r) => startOfWeek(r.createdAt).getTime()),
   );
   if (!weeks.size) return 0;
 
