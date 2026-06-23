@@ -20,7 +20,7 @@ export default function SummarySheet({ athlete, onClose }) {
           mode: brand.id,
           sport: athlete.sport,
           athlete: { firstName: athlete.name.split(' ')[0], age: athlete.age },
-          recaps: athlete.recaps.slice(0, 8).map((r) => ({
+          recaps: athlete.recaps.filter((r) => r.sent !== false).slice(0, 8).map((r) => ({
             headline: r.headline,
             parentMessage: r.parentMessage,
             date: fmtDate(r.createdAt),
@@ -73,7 +73,7 @@ export default function SummarySheet({ athlete, onClose }) {
           </IconButton>
         </div>
         <div style={{ fontSize: 12.5, color: T.ink40, marginBottom: 14 }}>
-          {athlete.name.split(' ')[0]} · {s.label} · {athlete.recaps.length} recaps
+          {athlete.name.split(' ')[0]} · {s.label} · {athlete.recaps.filter((r) => r.sent !== false).length} recaps
         </div>
 
         <div className="cc-scroll" style={{ overflowY: 'auto' }}>

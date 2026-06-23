@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Mic, Square, Sparkles, LoaderCircle, Keyboard } from 'lucide-react';
+import { Mic, Square, Sparkles, LoaderCircle, Keyboard, FileText } from 'lucide-react';
 import { T, TONES, sportById } from '../lib/sports';
 import { generateRecap } from '../lib/api';
 import { useSpeech } from '../lib/useSpeech';
 import { useBrand } from '../auth/BrandContext';
-import { Avatar, SelectChip, PrimaryButton, Eyebrow } from './ui';
+import { Avatar, SelectChip, PrimaryButton, GhostButton, Eyebrow } from './ui';
 import Screen from './Screen';
 
-export default function Capture({ athlete, initial, onBack, onGenerated }) {
+export default function Capture({ athlete, initial, onBack, onGenerated, onSaveNote }) {
   const { brand } = useBrand();
   const [transcript, setTranscript] = useState(initial?.transcript || '');
   const [sport, setSport] = useState(initial?.sport || athlete.sport);
@@ -44,9 +44,9 @@ export default function Capture({ athlete, initial, onBack, onGenerated }) {
       title="New recap"
       onBack={onBack}
       footer={
-        <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
           {error && (
-            <div role="alert" style={{ color: T.accentText, fontSize: 13, fontWeight: 600, marginBottom: 10, textAlign: 'center' }}>
+            <div role="alert" style={{ color: T.accentText, fontSize: 13, fontWeight: 600, marginBottom: 1, textAlign: 'center' }}>
               {error}
             </div>
           )}
@@ -63,7 +63,21 @@ export default function Capture({ athlete, initial, onBack, onGenerated }) {
               </>
             )}
           </PrimaryButton>
-        </>
+          {onSaveNote && (
+            <GhostButton
+              style={{ width: '100%' }}
+              disabled={!transcript.trim() || loading}
+              onClick={() => {
+                if (!transcript.trim()) return;
+                if (listening) stop();
+                onSaveNote({ sport, tone, transcript: transcript.trim() });
+              }}
+            >
+              <FileText size={15} strokeWidth={2.25} />
+              Save note as draft
+            </GhostButton>
+          )}
+        </div>
       }
     >
       {/* athlete header */}

@@ -55,6 +55,10 @@ export default function PhoneApp() {
           setDraft({ ...recap, transcript: recap.note || '' });
           setRoute({ name: 'edit', athleteId: athlete.id, recapId: recap.id });
         }}
+        onResumeDraft={(recap) => {
+          setDraft({ sport: recap.sport, tone: recap.tone, transcript: recap.note || '', _draftId: recap.id });
+          setRoute({ name: 'capture', athleteId: athlete.id });
+        }}
       />
     );
   } else if (route.name === 'capture') {
@@ -64,8 +68,14 @@ export default function PhoneApp() {
         initial={draft ? { sport: draft.sport, tone: draft.tone, transcript: draft.transcript } : null}
         onBack={() => openAthlete(athlete.id)}
         onGenerated={(recap, meta) => {
-          setDraft({ ...recap, ...meta });
+          setDraft((d) => ({ ...recap, ...meta, _draftId: d?._draftId }));
           setRoute({ name: 'review', athleteId: athlete.id });
+        }}
+        onSaveNote={({ sport, tone, transcript }) => {
+          const note = { sport, tone, note: transcript, headline: '', workedOn: [], improved: [], nextFocus: [], homework: '', parentMessage: '', sent: false };
+          if (draft?._draftId) updateRecap(athlete.id, draft._draftId, note);
+          else saveRecap(athlete.id, note);
+          openAthlete(athlete.id);
         }}
       />
     );
@@ -76,12 +86,15 @@ export default function PhoneApp() {
         draft={draft}
         onBack={() => setRoute({ name: 'capture', athleteId: athlete.id })}
         onSend={(finalRecap) => {
-          const saved = saveRecap(athlete.id, finalRecap);
+          const saved = draft?._draftId
+            ? updateRecap(athlete.id, draft._draftId, { ...finalRecap, sent: true })
+            : saveRecap(athlete.id, finalRecap);
           setSentRecap(saved);
           setRoute({ name: 'sent', athleteId: athlete.id });
         }}
         onSaveDraft={(draftRecap) => {
-          saveRecap(athlete.id, { ...draftRecap, sent: false });
+          if (draft?._draftId) updateRecap(athlete.id, draft._draftId, { ...draftRecap, sent: false });
+          else saveRecap(athlete.id, { ...draftRecap, sent: false });
           openAthlete(athlete.id);
         }}
       />

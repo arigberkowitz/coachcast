@@ -62,11 +62,47 @@ function TagRow({ icon, items, color }) {
   );
 }
 
-function RecapCard({ recap, index, athleteId, onEdit }) {
+function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
   const { brand } = useBrand();
   const { copied, copy } = useCopy();
   const [confirm, setConfirm] = useState(false);
   const fullText = recap.parentMessage + (recap.homework ? `\n\n${brand.recap.homework}: ${recap.homework}` : '');
+  const isNoteDraft = recap.sent === false && !recap.parentMessage;
+
+  if (isNoteDraft) {
+    return (
+      <div className="cc-anim-up" style={{ animationDelay: `${Math.min(index * 50, 200)}ms`, background: T.surface, border: `1px dashed ${T.lineStrong}`, borderRadius: T.r, padding: 15 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: T.ink40 }}>{fmtFullDate(recap.createdAt)}</span>
+          <span style={{ fontSize: 11, fontWeight: 700, color: '#8A5A07', background: '#FCE9C4', borderRadius: 999, padding: '2px 9px', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+            <FileText size={11} strokeWidth={2.5} /> Draft note
+          </span>
+        </div>
+        <p style={{ fontSize: 14, lineHeight: 1.5, color: recap.note ? T.ink70 : T.ink40, fontStyle: 'italic' }}>
+          {recap.note || 'Empty note'}
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 2, marginTop: 10, marginLeft: -8 }}>
+          {confirm ? (
+            <>
+              <span style={{ fontSize: 12.5, color: T.ink40, padding: '5px 8px' }}>Delete this draft?</span>
+              <CardAction danger onClick={() => deleteRecap(athleteId, recap.id)}>Delete</CardAction>
+              <CardAction onClick={() => setConfirm(false)}>Cancel</CardAction>
+            </>
+          ) : (
+            <>
+              <CardAction accent onClick={() => onResume(recap)}>
+                <Sparkles size={14} strokeWidth={2.25} /> Continue
+              </CardAction>
+              <CardAction danger onClick={() => setConfirm(true)}>
+                <Trash2 size={14} strokeWidth={2.25} /> Delete
+              </CardAction>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="cc-anim-up"
@@ -167,7 +203,7 @@ function RecapCard({ recap, index, athleteId, onEdit }) {
   );
 }
 
-export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }) {
+export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap, onResumeDraft }) {
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
   const [summarizing, setSummarizing] = useState(false);
@@ -225,7 +261,7 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
 
       <Goals athlete={athlete} />
 
-      {athlete.recaps.length >= 2 && (
+      {sentCount >= 2 && (
         <button
           onClick={() => setSummarizing(true)}
           style={{
@@ -269,7 +305,7 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 11 }}>
           {athlete.recaps.map((r, i) => (
-            <RecapCard key={r.id} recap={r} index={i} athleteId={athlete.id} onEdit={onEditRecap} />
+            <RecapCard key={r.id} recap={r} index={i} athleteId={athlete.id} onEdit={onEditRecap} onResume={onResumeDraft} />
           ))}
         </div>
       )}
