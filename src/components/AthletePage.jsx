@@ -4,9 +4,10 @@ import { T, space, sportById } from '../lib/sports';
 import { fmtFullDate, relativeDate } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
 import { deleteRecap } from '../data/store';
-import { Avatar, PrimaryButton, Eyebrow } from './ui';
+import { Avatar, PrimaryButton, Eyebrow, IconButton } from './ui';
 import Screen from './Screen';
 import SummarySheet from './SummarySheet';
+import EditAthleteSheet from './EditAthleteSheet';
 
 function CardAction({ children, onClick, danger }) {
   return (
@@ -146,11 +147,17 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
   const [summarizing, setSummarizing] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
 
   return (
     <Screen
       title=""
       onBack={onBack}
+      action={
+        <IconButton label="Edit profile" onClick={() => setEditingProfile(true)} style={{ marginRight: -6 }}>
+          <Pencil size={19} strokeWidth={2.1} color={T.ink70} />
+        </IconButton>
+      }
       footer={
         <PrimaryButton onClick={onNewRecap}>
           <Mic size={17} strokeWidth={2.25} />
@@ -240,6 +247,9 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap }
       )}
 
       {summarizing && <SummarySheet athlete={athlete} onClose={() => setSummarizing(false)} />}
+      {editingProfile && (
+        <EditAthleteSheet athlete={athlete} onClose={() => setEditingProfile(false)} onDeleted={onBack} />
+      )}
     </Screen>
   );
 }

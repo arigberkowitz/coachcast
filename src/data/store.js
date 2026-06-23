@@ -121,6 +121,28 @@ export function updateRecap(athleteId, recapId, patch) {
   return updated;
 }
 
+export function updateAthlete(id, patch) {
+  let updated = null;
+  setState({
+    ...state,
+    athletes: state.athletes.map((a) => {
+      if (a.id !== id) return a;
+      updated = {
+        ...a,
+        ...patch,
+        name: patch.name != null ? String(patch.name).trim() : a.name,
+        age: patch.age != null ? Number(patch.age) : a.age,
+      };
+      return updated;
+    }),
+  });
+  return updated;
+}
+
+export function deleteAthlete(id) {
+  setState({ ...state, athletes: state.athletes.filter((a) => a.id !== id) });
+}
+
 export function deleteRecap(athleteId, recapId) {
   setState({
     ...state,
