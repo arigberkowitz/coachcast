@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Copy, Mail } from 'lucide-react';
 import { T, space } from '../lib/sports';
+import { recapShareText } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
 import { useBrand } from '../auth/BrandContext';
 import { sendRecapEmail } from '../lib/api';
@@ -11,7 +12,7 @@ export default function Sent({ athlete, recap, onViewTimeline, onDone }) {
   const { brand } = useBrand();
   const { copied, copy } = useCopy();
 
-  const emailText = recap.parentMessage + (recap.homework ? `\n\n${brand.recap.homework}: ${recap.homework}` : '');
+  const emailText = recapShareText(recap, brand);
   const subject = `${recap.headline} — ${first}'s update`;
 
   const hasEmail = !!athlete.parentEmail;

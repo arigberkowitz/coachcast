@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, ChevronRight, Mic, X, Search } from 'lucide-react';
+import { Plus, ChevronRight, Mic, X, Search, MessageSquare } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { useStore, addAthlete } from '../data/store';
 import { useBrand } from '../auth/BrandContext';
 import { relativeDate } from '../lib/format';
+import { unreadForCoach } from '../lib/selectors';
 import { Avatar, IconButton, SelectChip, PrimaryButton } from './ui';
 import Screen from './Screen';
 
@@ -11,6 +12,7 @@ function AthleteRow({ athlete, onOpen, onNewRecap }) {
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
   const last = athlete.recaps[0];
+  const unread = unreadForCoach(athlete);
   return (
     <div
       role="button"
@@ -37,6 +39,11 @@ function AthleteRow({ athlete, onOpen, onNewRecap }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span style={{ fontWeight: 600, fontSize: 15.5, color: T.ink }}>{athlete.name}</span>
           <Icon size={13} strokeWidth={2.25} color={T.accent} />
+          {unread > 0 && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: '#fff', background: T.accent, borderRadius: 999, padding: '1px 7px 1px 6px' }}>
+              <MessageSquare size={10} strokeWidth={2.5} /> {unread}
+            </span>
+          )}
         </div>
         <div style={{ fontSize: 12.5, color: T.ink40, marginTop: 1 }}>
           Age {athlete.age} · {s.label} ·{' '}

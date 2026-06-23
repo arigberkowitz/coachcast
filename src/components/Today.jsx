@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mic, Flame, ChevronRight, CircleCheck, Clock, ArrowRight } from 'lucide-react';
+import { Mic, Flame, ChevronRight, CircleCheck, Clock, ArrowRight, MessageSquare } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { useStore } from '../data/store';
 import { useAuth } from '../auth/AuthContext';
@@ -12,6 +12,7 @@ import {
   weekStreak,
   dueAthletes,
   recentRecaps,
+  awaitingReply,
   DUE_DAYS,
 } from '../lib/selectors';
 import { Avatar, Eyebrow } from './ui';
@@ -108,6 +109,7 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
   const recent = recentRecaps(athletes, 6);
   const week = recapsThisWeek(athletes);
   const streak = weekStreak(athletes);
+  const waiting = awaitingReply(athletes);
 
   return (
     <Screen title="">
@@ -160,6 +162,42 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
         <Metric value={athletesRecappedThisWeek(athletes)} label={brand.personPlural.toLowerCase()} icon={<CircleCheck size={15} strokeWidth={2.25} />} />
         <Metric value={streak} label="week streak" icon={<Flame size={15} strokeWidth={2.25} className={streak > 0 ? 'cc-flicker' : undefined} />} />
       </div>
+
+      {/* parents waiting on a reply */}
+      {waiting.length > 0 && (
+        <div style={{ marginBottom: 22 }}>
+          <Eyebrow style={{ marginBottom: 8 }}>Parents waiting on you</Eyebrow>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            {waiting.slice(0, 4).map((r) => {
+              const last = (r.thread || []).filter((m) => m.from === 'family').slice(-1)[0];
+              const count = (r.thread || []).filter((m) => m.from === 'family' && !m.readByCoach).length;
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => onOpenAthlete(r.athlete.id)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 11, borderRadius: T.r, background: T.accentSoft, border: `1px solid ${T.accentSoft2}`, textAlign: 'left' }}
+                >
+                  <Avatar name={r.athlete.name} size={38} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 14.5, color: T.ink }}>
+                      {r.athlete.name.split(' ')[0]} · new message
+                    </div>
+                    <div style={{ fontSize: 12, color: T.ink70, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {last ? `“${last.text}”` : r.headline}
+                    </div>
+                  </div>
+                  {count > 0 && (
+                    <span style={{ flexShrink: 0, minWidth: 20, height: 20, padding: '0 6px', display: 'grid', placeItems: 'center', borderRadius: 999, background: T.accent, color: '#fff', fontSize: 11.5, fontWeight: 700 }}>
+                      {count}
+                    </span>
+                  )}
+                  <MessageSquare size={16} color={T.accentText} style={{ flexShrink: 0 }} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* due for a recap */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>

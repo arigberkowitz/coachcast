@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Mic, Check, Target, CheckCheck, MessageCircle, Sparkles, Copy, Pencil, Trash2, FileText, Send, NotebookPen } from 'lucide-react';
+import { Mic, Check, Target, CheckCheck, MessageCircle, MessageSquare, Sparkles, Copy, Pencil, Trash2, FileText, Send } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
-import { fmtFullDate, relativeDate } from '../lib/format';
+import { fmtFullDate, relativeDate, recapShareText } from '../lib/format';
 import { useCopy } from '../lib/useCopy';
 import { useBrand } from '../auth/BrandContext';
 import { deleteRecap, updateRecap } from '../data/store';
@@ -10,7 +10,10 @@ import Screen from './Screen';
 import SummarySheet from './SummarySheet';
 import EditAthleteSheet from './EditAthleteSheet';
 import Goals from './Goals';
+import ProgressChart from './ProgressChart';
 import FamilyAccessCard from './FamilyAccessCard';
+import RecapThread from './RecapThread';
+import HomeworkBlock from './HomeworkBlock';
 
 function CardAction({ children, onClick, danger, accent }) {
   return (
@@ -67,7 +70,10 @@ function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
   const { brand } = useBrand();
   const { copied, copy } = useCopy();
   const [confirm, setConfirm] = useState(false);
-  const fullText = recap.parentMessage + (recap.homework ? `\n\n${brand.recap.homework}: ${recap.homework}` : '');
+  const unread = (recap.thread || []).filter((m) => m.from === 'family' && !m.readByCoach).length;
+  const threadCount = (recap.thread || []).length;
+  const [showThread, setShowThread] = useState(unread > 0);
+  const fullText = recapShareText(recap, brand);
   const isNoteDraft = recap.sent === false && !recap.parentMessage;
 
   if (isNoteDraft) {
@@ -164,14 +170,7 @@ function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
         <p style={{ fontSize: 13.5, lineHeight: 1.55, color: T.ink70 }}>{recap.parentMessage}</p>
       </div>
 
-      {recap.homework && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 10, padding: '9px 11px', borderRadius: T.rSm, background: T.accentSoft }}>
-          <NotebookPen size={14} color={T.accentText} style={{ flexShrink: 0, marginTop: 2 }} />
-          <p style={{ fontSize: 13, lineHeight: 1.5, color: T.accentText }}>
-            <strong style={{ fontWeight: 700 }}>{brand.recap.homework}:</strong> {recap.homework}
-          </p>
-        </div>
-      )}
+      <HomeworkBlock recap={recap} brand={brand} />
 
       {recap.photo && (
         <img src={recap.photo} alt="Session attachment" style={{ width: '100%', borderRadius: T.rSm, marginTop: 10, display: 'block', border: `1px solid ${T.line}` }} />
@@ -191,6 +190,12 @@ function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
                 <Send size={14} strokeWidth={2.25} /> Send now
               </CardAction>
             )}
+            {recap.sent !== false && (
+              <CardAction accent={unread > 0} onClick={() => setShowThread((v) => !v)}>
+                <MessageSquare size={14} strokeWidth={2.25} />
+                {unread > 0 ? `${unread} new` : threadCount > 0 ? `Messages (${threadCount})` : 'Message family'}
+              </CardAction>
+            )}
             <CardAction onClick={() => copy(fullText)}>
               {copied ? <Check size={14} strokeWidth={2.5} color={T.accent} /> : <Copy size={14} strokeWidth={2.25} />}
               {copied ? 'Copied' : 'Copy'}
@@ -204,6 +209,10 @@ function RecapCard({ recap, index, athleteId, onEdit, onResume }) {
           </>
         )}
       </div>
+
+      {recap.sent !== false && showThread && (
+        <RecapThread mode={brand.id} athleteId={athleteId} recap={recap} role="coach" />
+      )}
     </div>
   );
 }
@@ -263,6 +272,8 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap, 
           label="last session"
         />
       </div>
+
+      <ProgressChart athlete={athlete} />
 
       <Goals athlete={athlete} />
 

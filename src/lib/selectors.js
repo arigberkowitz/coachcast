@@ -66,6 +66,36 @@ export function weekStreak(athletes, now = Date.now()) {
   return count;
 }
 
+// ---- two-way loop ----
+
+// Count of family messages the coach hasn't read yet, for one athlete.
+export function unreadForCoach(athlete) {
+  return (athlete.recaps || []).reduce(
+    (n, r) => n + (r.thread || []).filter((m) => m.from === 'family' && !m.readByCoach).length,
+    0,
+  );
+}
+
+// Recaps with unread family messages, newest first, each carrying its athlete.
+export function awaitingReply(athletes) {
+  return allRecaps(athletes).filter((r) => (r.thread || []).some((m) => m.from === 'family' && !m.readByCoach));
+}
+
+// Sent recaps per week for the last `weeks` weeks (oldest → newest), for the chart.
+export function weeklySessionCounts(athlete, weeks = 8, now = Date.now()) {
+  const sent = (athlete.recaps || []).filter(isSent);
+  const cur = startOfWeek(now);
+  const out = [];
+  for (let i = weeks - 1; i >= 0; i--) {
+    const start = new Date(cur);
+    start.setDate(start.getDate() - i * 7);
+    const ts = start.getTime();
+    const count = sent.filter((r) => startOfWeek(r.createdAt).getTime() === ts).length;
+    out.push({ ts, count, label: `${start.getMonth() + 1}/${start.getDate()}` });
+  }
+  return out;
+}
+
 // Athletes with no recap, or whose most recent recap is `days`+ old. Most-overdue first.
 export function dueAthletes(athletes, days = DUE_DAYS, now = Date.now()) {
   const threshold = days * 86400000;

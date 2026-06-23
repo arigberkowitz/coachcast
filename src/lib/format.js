@@ -20,6 +20,20 @@ export function athleteCode(athlete) {
   return `${name}-${num}`;
 }
 
+// The homework block as plain text (assignment + how-to + drill link), for copy/email.
+export function homeworkBlock(recap, brand) {
+  if (!recap.homework) return '';
+  let s = `\n\n${brand.recap.homework}: ${recap.homework}`;
+  if (recap.homeworkHow) s += `\nHow: ${recap.homeworkHow}`;
+  if (recap.homeworkLink) s += `\nWatch: ${recap.homeworkLink}`;
+  return s;
+}
+
+// The full parent-facing recap text (message + homework block) for copy/email.
+export function recapShareText(recap, brand) {
+  return recap.parentMessage + homeworkBlock(recap, brand);
+}
+
 export function relativeDate(iso) {
   const then = new Date(iso).getTime();
   const days = Math.round((Date.now() - then) / 86400000);

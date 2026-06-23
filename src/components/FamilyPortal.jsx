@@ -1,10 +1,14 @@
-import { useState } from 'react';
-import { Sparkles, ArrowRight, ChevronLeft, Check, Target, MessageCircle, NotebookPen, CircleCheck, Circle, LogOut } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Sparkles, ArrowRight, ChevronLeft, Check, Target, MessageCircle, CircleCheck, Circle, LogOut, Bell, BellRing } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { getBrand } from '../lib/brands';
 import { fmtFullDate, relativeDate } from '../lib/format';
 import { findAthleteByCode } from '../data/store';
 import { useBrand } from '../auth/BrandContext';
+import { ensureNotifyPermission, notifyPermission, showLocalNotification } from '../lib/notify';
+import ProgressChart from './ProgressChart';
+import RecapThread from './RecapThread';
+import HomeworkBlock from './HomeworkBlock';
 
 const CODE_KEY = 'coachcast.familycode';
 
@@ -18,6 +22,25 @@ export default function FamilyPortal() {
       return null;
     }
   });
+
+  // Re-resolve the athlete from storage (after a family write, or a cross-tab change
+  // when the coach sends/replies in another window).
+  const refresh = () => {
+    try {
+      const c = sessionStorage.getItem(CODE_KEY);
+      if (!c) return;
+      const found = findAthleteByCode(c);
+      if (found) setEntry(found);
+    } catch {
+      // ignore
+    }
+  };
+
+  useEffect(() => {
+    const onStorage = () => refresh();
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
 
   const onChild = (found, code) => {
     try {
@@ -36,7 +59,7 @@ export default function FamilyPortal() {
     setEntry(null);
   };
 
-  if (entry) return <FamilyView entry={entry} onChange={changeChild} onExit={clearBrand} />;
+  if (entry) return <FamilyView entry={entry} onChange={changeChild} onExit={clearBrand} onRefresh={refresh} />;
   return <FamilyEntry onFound={onChild} onExit={clearBrand} />;
 }
 
@@ -128,13 +151,38 @@ function ROTag({ icon, items }) {
   );
 }
 
-function FamilyView({ entry, onChange, onExit }) {
+function FamilyView({ entry, onChange, onExit, onRefresh }) {
   const { athlete, mode } = entry;
   const brand = getBrand(mode);
   const s = sportById(athlete.sport);
   const Icon = s.Icon;
+  const first = athlete.name.split(' ')[0];
+  const coachLabel = mode === 'tutor' ? 'Tutor' : 'Coach';
   const recaps = athlete.recaps.filter((r) => r.sent !== false);
   const goals = athlete.goals || [];
+
+  // Notifications opt-in. Fires a local notification when a new recap arrives while
+  // the portal is open (e.g. the coach sends from another window).
+  const [perm, setPerm] = useState(() => notifyPermission());
+  const notifyOn = perm === 'granted';
+  const enableNotify = async () => setPerm(await ensureNotifyPermission());
+
+  const idsKey = recaps.map((r) => r.id).join(',');
+  const seen = useRef(null);
+  useEffect(() => {
+    const ids = recaps.map((r) => r.id);
+    if (seen.current === null) {
+      seen.current = new Set(ids);
+      return;
+    }
+    const fresh = ids.filter((id) => !seen.current.has(id));
+    fresh.forEach((id) => seen.current.add(id));
+    if (notifyOn && fresh.length) {
+      const r = recaps.find((x) => x.id === fresh[0]);
+      showLocalNotification(`New update for ${first}`, r?.headline || 'New progress update');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, notifyOn]);
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: T.bg }}>
@@ -147,6 +195,16 @@ function FamilyView({ entry, onChange, onExit }) {
           <span style={{ fontFamily: space.display, fontWeight: 700, fontSize: 18, letterSpacing: '-.01em', color: T.ink }}>{athlete.name.split(' ')[0]}'s progress</span>
         </div>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14 }}>
+          {perm !== 'unsupported' && (
+            <button
+              onClick={enableNotify}
+              title={notifyOn ? 'Update alerts are on' : perm === 'denied' ? 'Alerts blocked in browser settings' : 'Get notified of new updates'}
+              aria-label="Notifications"
+              style={{ display: 'inline-flex', alignItems: 'center', color: notifyOn ? T.accentText : T.ink70 }}
+            >
+              {notifyOn ? <BellRing size={16} strokeWidth={2.25} /> : <Bell size={16} strokeWidth={2.25} />}
+            </button>
+          )}
           <button onClick={onChange} style={{ fontSize: 13, fontWeight: 600, color: T.ink70 }}>Change code</button>
           <button onClick={onExit} title="Exit" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 13, fontWeight: 600, color: T.ink70 }}>
             <LogOut size={16} /> Exit
@@ -168,6 +226,8 @@ function FamilyView({ entry, onChange, onExit }) {
               </div>
             </div>
           </div>
+
+          <ProgressChart athlete={athlete} />
 
           {/* goals */}
           {goals.length > 0 && (
@@ -196,17 +256,11 @@ function FamilyView({ entry, onChange, onExit }) {
                     <MessageCircle size={14} color={T.ink40} style={{ flexShrink: 0, marginTop: 2 }} />
                     <p style={{ fontSize: 13.5, lineHeight: 1.55, color: T.ink70 }}>{r.parentMessage}</p>
                   </div>
-                  {r.homework && (
-                    <div style={{ display: 'flex', gap: 8, marginTop: 10, padding: '9px 11px', borderRadius: T.rSm, background: T.accentSoft }}>
-                      <NotebookPen size={14} color={T.accentText} style={{ flexShrink: 0, marginTop: 2 }} />
-                      <p style={{ fontSize: 13, lineHeight: 1.5, color: T.accentText }}>
-                        <strong style={{ fontWeight: 700 }}>{brand.recap.homework}:</strong> {r.homework}
-                      </p>
-                    </div>
-                  )}
+                  <HomeworkBlock recap={r} brand={brand} />
                   {r.photo && (
                     <img src={r.photo} alt="Session attachment" style={{ width: '100%', borderRadius: T.rSm, marginTop: 10, display: 'block', border: `1px solid ${T.line}` }} />
                   )}
+                  <RecapThread mode={mode} athleteId={athlete.id} recap={r} role="family" coachLabel={coachLabel} onChange={onRefresh} />
                 </div>
               ))}
             </div>

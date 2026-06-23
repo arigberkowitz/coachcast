@@ -59,6 +59,8 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
   const [improved, setImproved] = useState(draft.improved || []);
   const [nextFocus, setNextFocus] = useState(draft.nextFocus || []);
   const [homework, setHomework] = useState(draft.homework || '');
+  const [homeworkHow, setHomeworkHow] = useState(draft.homeworkHow || '');
+  const [homeworkLink, setHomeworkLink] = useState(draft.homeworkLink || '');
   const [photo, setPhoto] = useState(draft.photo || '');
   const [parentMessage, setParentMessage] = useState(draft.parentMessage || '');
 
@@ -84,6 +86,7 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
       setImproved(r.improved || []);
       setNextFocus(r.nextFocus || []);
       setHomework(r.homework || '');
+      setHomeworkHow(r.homeworkHow || '');
       setParentMessage(r.parentMessage || '');
       setTone(newTone);
       setTranslatedTo(null);
@@ -127,6 +130,8 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
     improved: improved.map((x) => x.trim()).filter(Boolean),
     nextFocus: nextFocus.map((x) => x.trim()).filter(Boolean),
     homework: homework.trim(),
+    homeworkHow: homework.trim() ? homeworkHow.trim() : '',
+    homeworkLink: homework.trim() ? homeworkLink.trim() : '',
     photo,
     parentMessage: parentMessage.trim(),
     language: translatedTo || 'English',
@@ -236,6 +241,29 @@ export default function Review({ athlete, draft, onBack, onSend, onSaveDraft, ed
             onFocus={(e) => (e.target.style.borderColor = T.accent)}
             onBlur={(e) => (e.target.style.borderColor = T.line)}
           />
+          {homework.trim() && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <textarea
+                value={homeworkHow}
+                onChange={(e) => setHomeworkHow(e.target.value)}
+                rows={2}
+                placeholder="How to practice it at home (optional)"
+                style={{ width: '100%', padding: '10px 13px', borderRadius: T.rSm, border: `1.5px solid ${T.line}`, background: T.surface, fontSize: 13.5, lineHeight: 1.5, color: T.ink, outline: 'none', resize: 'vertical' }}
+                onFocus={(e) => (e.target.style.borderColor = T.accent)}
+                onBlur={(e) => (e.target.style.borderColor = T.line)}
+              />
+              <input
+                value={homeworkLink}
+                onChange={(e) => setHomeworkLink(e.target.value)}
+                type="url"
+                inputMode="url"
+                placeholder="Drill video link (optional)"
+                style={{ width: '100%', padding: '10px 13px', borderRadius: T.rSm, border: `1.5px solid ${T.line}`, background: T.surface, fontSize: 13.5, color: T.ink, outline: 'none' }}
+                onFocus={(e) => (e.target.style.borderColor = T.accent)}
+                onBlur={(e) => (e.target.style.borderColor = T.line)}
+              />
+            </div>
+          )}
         </div>
 
         {/* photo */}
