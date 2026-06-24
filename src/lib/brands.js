@@ -112,7 +112,7 @@ export const BRANDS = {
         tags: ['Footwork', 'Right-hand finish'],
       },
     },
-    chooser: { title: 'I coach a sport', sub: 'Basketball, golf, tennis, baseball, soccer' },
+    chooser: { title: 'Coach', sub: 'Basketball, golf, tennis, baseball, soccer' },
     seed: coachSeed,
   },
   tutor: {
@@ -138,7 +138,7 @@ export const BRANDS = {
         tags: ['Fractions', 'Common denominators'],
       },
     },
-    chooser: { title: 'I tutor a subject', sub: 'Math, reading, science, test prep, languages, and more' },
+    chooser: { title: 'Tutor', sub: 'Math, reading, science, test prep, languages, and more' },
     seed: tutorSeed,
   },
 };
@@ -151,5 +151,5 @@ export const FAMILY = {
   id: 'family',
   name: 'Family',
   accent: { accent: '#1F73C9', accentText: '#0B4E96', accentSoft: '#DEECFB', accentSoft2: '#BCD8F4', accentGlow: 'rgba(31,115,201,.45)' },
-  chooser: { title: "I'm a parent or student", sub: "See a child's progress and homework with a code" },
+  chooser: { title: 'Parent or student', sub: "See a child's progress and homework with a code" },
 };
