@@ -11,6 +11,7 @@ import SummarySheet from './SummarySheet';
 import EditAthleteSheet from './EditAthleteSheet';
 import Goals from './Goals';
 import ProgressChart from './ProgressChart';
+import BillingCard from './BillingCard';
 import FamilyAccessCard from './FamilyAccessCard';
 import RecapThread from './RecapThread';
 import HomeworkBlock from './HomeworkBlock';
@@ -274,6 +275,8 @@ export default function AthletePage({ athlete, onBack, onNewRecap, onEditRecap, 
       </div>
 
       <ProgressChart athlete={athlete} />
+
+      <BillingCard athlete={athlete} />
 
       <Goals athlete={athlete} />
 

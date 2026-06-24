@@ -96,6 +96,43 @@ export function weeklySessionCounts(athlete, weeks = 8, now = Date.now()) {
   return out;
 }
 
+// ---- coaching business: session packages + cadence ----
+
+// Sessions delivered ≈ recaps sent (most coaches send one recap per session).
+export function sessionsUsed(athlete) {
+  return (athlete.recaps || []).filter(isSent).length;
+}
+
+// Sessions left in the current package, or null if no package is set.
+export function planRemaining(athlete) {
+  const total = athlete.plan?.total;
+  if (!total) return null;
+  return Math.max(0, total - sessionsUsed(athlete));
+}
+
+// Athletes with a package that hasn't been marked paid.
+export function paymentsDue(athletes) {
+  return athletes.filter((a) => a.plan?.total && !a.plan.paid);
+}
+
+// Athletes with a booked next session today or later, soonest first.
+export function upcomingSessions(athletes, now = Date.now()) {
+  const d = new Date(now);
+  d.setHours(0, 0, 0, 0);
+  const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return athletes
+    .filter((a) => a.nextSession && a.nextSession >= todayStr)
+    .sort((a, b) => a.nextSession.localeCompare(b.nextSession));
+}
+
+// Athletes with a package running low (<= n sessions left, not yet at zero handled by caller).
+export function lowOnSessions(athletes, n = 1) {
+  return athletes.filter((a) => {
+    const left = planRemaining(a);
+    return left != null && left <= n;
+  });
+}
+
 // Athletes with no recap, or whose most recent recap is `days`+ old. Most-overdue first.
 export function dueAthletes(athletes, days = DUE_DAYS, now = Date.now()) {
   const threshold = days * 86400000;

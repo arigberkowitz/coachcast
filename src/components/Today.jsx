@@ -4,7 +4,7 @@ import { T, space, sportById } from '../lib/sports';
 import { useStore } from '../data/store';
 import { useAuth } from '../auth/AuthContext';
 import { useBrand } from '../auth/BrandContext';
-import { relativeDate } from '../lib/format';
+import { relativeDate, fmtDate } from '../lib/format';
 import { useCountUp } from '../lib/useCountUp';
 import {
   recapsThisWeek,
@@ -13,6 +13,8 @@ import {
   dueAthletes,
   recentRecaps,
   awaitingReply,
+  upcomingSessions,
+  paymentsDue,
   DUE_DAYS,
 } from '../lib/selectors';
 import { Avatar, Eyebrow } from './ui';
@@ -99,6 +101,30 @@ function RecentRow({ recap, onOpen }) {
   );
 }
 
+function BizRow({ athlete, sub, right, accent, onClick }) {
+  const s = sportById(athlete.sport);
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onClick())}
+      style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 11, borderRadius: T.r, background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.shadowSoft, cursor: 'pointer' }}
+    >
+      <Avatar name={athlete.name} size={38} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontWeight: 600, fontSize: 14.5 }}>{athlete.name}</span>
+          <s.Icon size={12} color={T.accent} strokeWidth={2.25} />
+        </div>
+        <div style={{ fontSize: 12, color: T.ink40 }}>{sub}</div>
+      </div>
+      <span style={{ fontSize: 13.5, fontWeight: 700, color: accent ? T.accentText : T.ink, flexShrink: 0 }}>{right}</span>
+      <ChevronRight size={17} color={T.ink40} style={{ flexShrink: 0 }} />
+    </div>
+  );
+}
+
 export default function Today({ onNewRecap, onOpenAthlete }) {
   const { athletes } = useStore();
   const { user } = useAuth();
@@ -110,6 +136,8 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
   const week = recapsThisWeek(athletes);
   const streak = weekStreak(athletes);
   const waiting = awaitingReply(athletes);
+  const upcoming = upcomingSessions(athletes);
+  const duePay = paymentsDue(athletes);
 
   return (
     <Screen title="">
@@ -195,6 +223,43 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
                 </button>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* payments due */}
+      {duePay.length > 0 && (
+        <div style={{ marginBottom: 22 }}>
+          <Eyebrow style={{ marginBottom: 8 }}>Payments due</Eyebrow>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            {duePay.map((a) => (
+              <BizRow
+                key={a.id}
+                athlete={a}
+                sub={`${a.plan.total}-session package`}
+                right={`$${a.plan.total * a.plan.rate}`}
+                accent
+                onClick={() => onOpenAthlete(a.id)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* upcoming sessions */}
+      {upcoming.length > 0 && (
+        <div style={{ marginBottom: 22 }}>
+          <Eyebrow style={{ marginBottom: 8 }}>Coming up</Eyebrow>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+            {upcoming.map((a) => (
+              <BizRow
+                key={a.id}
+                athlete={a}
+                sub="Next session"
+                right={fmtDate(`${a.nextSession}T00:00:00`)}
+                onClick={() => onOpenAthlete(a.id)}
+              />
+            ))}
           </div>
         </div>
       )}
