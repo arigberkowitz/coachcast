@@ -7,38 +7,87 @@ import AthletePage from './AthletePage';
 import Capture from './Capture';
 import Review from './Review';
 import Sent from './Sent';
+import GroupPicker from './GroupPicker';
+import GroupCapture from './GroupCapture';
+import GroupReview from './GroupReview';
 
 // Two root tabs (Today, Athletes) with push routes layered on top
 // (Athlete → Capture → Review → Sent). The tab bar shows only at root;
 // pushed screens are full-focus.
 export default function PhoneApp() {
-  const { athletes } = useStore();
+  const { athletes, groups: groupsRaw } = useStore();
+  const groups = groupsRaw || [];
   const [tab, setTab] = useState('today');
   const [route, setRoute] = useState(null); // null = at root tab
   const [draft, setDraft] = useState(null);
   const [sentRecap, setSentRecap] = useState(null);
+  const [groupDraft, setGroupDraft] = useState(null);
 
   const openAthlete = (id) => setRoute({ name: 'athlete', athleteId: id });
   const newRecap = (id) => {
     setDraft(null);
     setRoute({ name: 'capture', athleteId: id });
   };
+  const newGroupRecap = () => setRoute({ name: 'groupPicker' });
 
-  // A pushed route needs a valid athlete; otherwise fall back to the root tabs.
-  const athlete = route ? athletes.find((a) => a.id === route.athleteId) : null;
+  // A pushed athlete route needs a valid athlete; group routes carry a groupId.
+  const athlete = route && route.athleteId ? athletes.find((a) => a.id === route.athleteId) : null;
+  const isGroupRoute = route && ['groupPicker', 'groupCapture', 'groupReview'].includes(route.name);
 
   // ---- Root tabs ----
-  if (!route || !athlete) {
+  if (!route || (!athlete && !isGroupRoute)) {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <div key={tab} style={{ flex: 1, minHeight: 0 }}>
           {tab === 'today' ? (
-            <Today onNewRecap={newRecap} onOpenAthlete={openAthlete} />
+            <Today onNewRecap={newRecap} onOpenAthlete={openAthlete} onNewGroupRecap={newGroupRecap} />
           ) : (
             <Home onOpenAthlete={openAthlete} onNewRecap={newRecap} />
           )}
         </div>
         <TabBar active={tab} onChange={setTab} />
+      </div>
+    );
+  }
+
+  // ---- Group Recap routes ----
+  if (isGroupRoute) {
+    const group = route.groupId ? groups.find((g) => g.id === route.groupId) : null;
+    const members = group ? group.memberIds.map((id) => athletes.find((a) => a.id === id)).filter(Boolean) : [];
+    const toPicker = () => setRoute({ name: 'groupPicker' });
+    let gscreen;
+    if (route.name === 'groupCapture' && group) {
+      gscreen = (
+        <GroupCapture
+          group={group}
+          members={members}
+          initialNote={groupDraft?.note || ''}
+          onBack={toPicker}
+          onGenerated={(recaps, meta) => {
+            setGroupDraft({ recaps, ...meta });
+            setRoute({ name: 'groupReview', groupId: group.id });
+          }}
+        />
+      );
+    } else if (route.name === 'groupReview' && group && groupDraft) {
+      gscreen = (
+        <GroupReview
+          group={group}
+          draft={groupDraft}
+          onBack={() => setRoute({ name: 'groupCapture', groupId: group.id })}
+          onDone={() => {
+            setGroupDraft(null);
+            setRoute(null);
+          }}
+        />
+      );
+    } else {
+      // groupPicker, or a stale/invalid group/draft → back to the picker
+      gscreen = <GroupPicker onBack={() => setRoute(null)} onStart={(gid) => setRoute({ name: 'groupCapture', groupId: gid })} />;
+    }
+    return (
+      <div key={route.name} style={{ height: '100%' }}>
+        {gscreen}
       </div>
     );
   }

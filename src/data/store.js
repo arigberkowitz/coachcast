@@ -24,7 +24,7 @@ function load(m) {
   } catch {
     // ignore — fall through to seed
   }
-  return { athletes: brand.seed };
+  return { athletes: brand.seed, groups: brand.seedGroups || [] };
 }
 
 function persist() {
@@ -188,7 +188,36 @@ export function deleteRecap(athleteId, recapId) {
 }
 
 export function resetStore() {
-  if (mode) setState({ athletes: getBrand(mode).seed });
+  if (mode) setState({ athletes: getBrand(mode).seed, groups: getBrand(mode).seedGroups || [] });
+}
+
+// ---- groups (for Group Recap: one note → personalized recaps for a whole group) ----
+
+export function getGroup(id) {
+  return (state.groups || []).find((g) => g.id === id) || null;
+}
+
+export function addGroup(name, memberIds = []) {
+  const g = { id: uid(), name: name.trim(), memberIds: [...memberIds] };
+  setState({ ...state, groups: [...(state.groups || []), g] });
+  return g;
+}
+
+export function updateGroup(id, patch) {
+  let updated = null;
+  setState({
+    ...state,
+    groups: (state.groups || []).map((g) => {
+      if (g.id !== id) return g;
+      updated = { ...g, ...patch, name: patch.name != null ? String(patch.name).trim() : g.name };
+      return updated;
+    }),
+  });
+  return updated;
+}
+
+export function deleteGroup(id) {
+  setState({ ...state, groups: (state.groups || []).filter((g) => g.id !== id) });
 }
 
 // ---- read-only, cross-dataset lookup for the family portal ----

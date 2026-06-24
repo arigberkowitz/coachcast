@@ -71,6 +71,11 @@ export function polishNote(text) {
   return postJSON('/api/polish', { text }); // { text }
 }
 
+// Group Recap: one shared note → a personalized recap per member.
+export function groupRecap({ mode, sport, tone, note, members }) {
+  return postJSON('/api/group-recap', { mode, sport, tone, note, members }); // { recaps: [...] }
+}
+
 export function summarizeAthlete({ mode, sport, athlete, recaps }) {
   return postJSON('/api/summarize', { mode, sport, athlete, recaps }); // { headline, summary }
 }

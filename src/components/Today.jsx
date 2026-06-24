@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mic, Flame, ChevronRight, CircleCheck, Clock, ArrowRight, MessageSquare } from 'lucide-react';
+import { Mic, Flame, ChevronRight, CircleCheck, Clock, ArrowRight, MessageSquare, Users } from 'lucide-react';
 import { T, space, sportById } from '../lib/sports';
 import { useStore } from '../data/store';
 import { useAuth } from '../auth/AuthContext';
@@ -125,7 +125,7 @@ function BizRow({ athlete, sub, right, accent, onClick }) {
   );
 }
 
-export default function Today({ onNewRecap, onOpenAthlete }) {
+export default function Today({ onNewRecap, onOpenAthlete, onNewGroupRecap }) {
   const { athletes } = useStore();
   const { user } = useAuth();
   const { brand } = useBrand();
@@ -182,6 +182,23 @@ export default function Today({ onNewRecap, onOpenAthlete }) {
         </span>
         <ArrowRight size={20} strokeWidth={2.25} />
       </button>
+
+      {/* group recap entry */}
+      {onNewGroupRecap && (
+        <button
+          onClick={onNewGroupRecap}
+          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left', padding: '12px 14px', borderRadius: T.r, background: T.surface, border: `1px solid ${T.line}`, boxShadow: T.shadowSoft, marginTop: -8, marginBottom: 22 }}
+        >
+          <span style={{ width: 36, height: 36, borderRadius: 11, background: T.accentSoft, color: T.accent, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+            <Users size={18} strokeWidth={2.1} />
+          </span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ display: 'block', fontWeight: 600, fontSize: 14.5, color: T.ink }}>New group recap</span>
+            <span style={{ display: 'block', fontSize: 12.5, color: T.ink40 }}>One note → a recap for every kid in a group</span>
+          </span>
+          <ChevronRight size={18} color={T.ink40} style={{ flexShrink: 0 }} />
+        </button>
+      )}
 
       {/* this week */}
       <Eyebrow style={{ marginBottom: 8 }}>This week</Eyebrow>

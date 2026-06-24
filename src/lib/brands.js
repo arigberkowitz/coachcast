@@ -114,6 +114,7 @@ export const BRANDS = {
     },
     chooser: { title: 'Coach', sub: 'Basketball, golf, tennis, baseball, soccer' },
     seed: coachSeed,
+    seedGroups: [{ id: 'grp_coach_1', name: 'Tuesday Skills Clinic', memberIds: ['a_maya', 'a_diego', 'a_ava'] }],
   },
   tutor: {
     id: 'tutor',
@@ -140,6 +141,7 @@ export const BRANDS = {
     },
     chooser: { title: 'Tutor', sub: 'Math, reading, science, test prep, languages, and more' },
     seed: tutorSeed,
+    seedGroups: [{ id: 'grp_tutor_1', name: 'Wednesday Study Group', memberIds: ['s_sofia', 's_priya', 's_hana'] }],
   },
 };
 
